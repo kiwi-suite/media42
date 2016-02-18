@@ -64,6 +64,13 @@ return [
         ],
     ],
 
+    'assets' => [
+        __NAMESPACE__ => [
+            'target' => 'public/assets/media42/core',
+            'source' => 'module/media42/assets/dist/',
+        ],
+    ],
+
     'migration' => [
         'directory'     => [
             __NAMESPACE__ => __DIR__ . '/../data/migrations'

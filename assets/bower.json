@@ -1,0 +1,24 @@
+{
+  "name": "media42",
+  "version": "1.0.0",
+  "authors": [
+    "Thomas Payer <payer@raum42.at>"
+  ],
+  "license": "",
+  "homepage": "http://www.raum42.at",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-file-upload": "2.2.0",
+    "cropper": "~0.10.0"
+  },
+  "resolutions": {
+    "angular": "~1.3.13"
+  }
+}
