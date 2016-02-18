@@ -1,0 +1,18 @@
+{
+    "name": "fruit42/media42",
+    "type": "zend-module",
+    "require": {
+        "php": ">=5.5",
+        "ext-intl" : "*",
+        "composer/installers": "~1.0",
+        "fruit42/core42": "^2.0.0",
+        "imagine/imagine": "~0.6.2"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-4": {
+            "Media42\\": "src/Media42/"
+        }
+    }
+}

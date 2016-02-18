@@ -1,0 +1,132 @@
+<div class="wrapper-md bg-white b-b box-shadow">
+    <h1 class="m-n font-thin h3">
+        <span class="fa fa-picture-o"></span>
+        <?= $this->translate('title.media', 'admin') ?>
+    </h1>
+</div>
+<div class="wrapper-md">
+    <form class="form-horizontal" role="form" action="<?= $this->url(null, array(), array(), true) ?>" method="post">
+        <div class="panel b-a">
+            <div class="panel-body">
+                <?= $this->form($this->editForm)?>
+            </div>
+            <div class="panel-footer">
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-md-10">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="fa fa-save"></span>
+                            <?= $this->translate('button.save', 'admin') ?>
+                        </button>
+
+                        <delete
+                            url="<?= $this->url('admin/media/delete') ?>"
+                            title="<?= $this->translate("media.modal.delete.title", "admin") ?>"
+                            content="<?= $this->translate("media.modal.delete.content", "admin") ?>"
+                            request-id="<?= $this->params()->fromRoute("id") ?>"
+                            >
+                        </delete>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<?php if (substr($this->media->getMimeType(), 0, 6) == "image/"): ?>
+<?php
+$jsonDataId = uniqid('crop/') . '.json';
+$this->admin()->addJsonTemplate($jsonDataId, [
+    'dimension' => $this->dimensions,
+    'meta' => \Zend\Json\Json::decode($this->media->getMeta()),
+    'imageSize' => $this->imageSize
+]);
+?>
+<div class="wrapper-md hidden-xs hidden-sm" ng-controller="CropController" data-json="<?= $jsonDataId ?>">
+    <div class="panel b-a">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="img-container" style="max-height: 700px; max-width: 1200px;">
+                        <img
+                            ng-cropper
+                            src="<?= $this->mediaUrl($this->media->getId())?>">
+                    </div>
+
+                </div>
+
+                <div class="col-md-4">
+                    <div ng-show="currentInfo.width > 0 && currentInfo.height > 0" class="panel panel-info">
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    Width:
+                                </div>
+                                <div class="col-sm-3 text-right">
+                                    <b>{{ currentInfo.width }}px</b>
+                                </div>
+                                <div class="col-sm-3 text-right">
+                                    ({{ currentInfo.calcWidth }}px)
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    Height:
+                                </div>
+                                <div class="col-sm-3 text-right">
+                                    <b>{{ currentInfo.height }}px</b>
+                                </div>
+                                <div class="col-sm-3 text-right">
+                                    ({{ currentInfo.calcHeight }}px)
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <ul class="list-group">
+                        <li class="list-group-item" ng-repeat="(name, data) in dimensions" ng-class="isActive(name)">
+                            <div ng-if="!checkImageSize(data)" class="media">
+                                <div class="media-body">
+                                    <div class="row">
+                                        <div class="col-md-10 col-md-offset-2">
+                                            {{ data.name }}<br/>
+                                            <small class="text-muted">({{data.width}} x {{data.height}})</small>
+                                            <div class="text-warning">
+                                                <span class="fa fa-warning"></span> <?= $this->translate('media.warning.image-too-small') ?>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div ng-if="checkImageSize(data)" class="media">
+                                <div class="media-body">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <a class="btn btn-default" ng-click="selectDimension(name)">
+                                                <span class="fa fa-crop"></span>
+                                            </a>
+                                        </div>
+                                        <div class="col-md-6">
+                                            {{ data.name }}<br/>
+                                            <small class="text-muted">({{data.width}} x {{data.height}})</small>
+                                        </div>
+                                        <div class="col-md-4 text-right">
+                                            <button
+                                                ng-if="hasChanges[name] && checkImageSize(data)"
+                                                class="btn btn-success btn-sm"
+                                                ng-click="saveCroppedImage(name, '<?= $this->url('admin/media/crop', ['id' => $this->media->getId(), 'dimension' => '{{ name }}'])?>')">
+                                                <span class="fa fa-save"></span>
+                                                <?= $this->translate('button.save', 'admin') ?>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
