@@ -13,7 +13,7 @@ return [
         ],
 
         'media-regenerate-images' => [
-            'route'                     => '[--force] [--dimension=]',
+            'route'                     => '[--force] [--dimension=] [--category=]',
             'command-name'              => 'Media42\Regenerate',
             'description'               => 'Regenerate all Images',
             'short_description'         => 'Regenerate all Images',

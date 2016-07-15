@@ -30,6 +30,11 @@ abstract class AbstractAddCommand extends AbstractCommand
     protected $resizeOriginalDimension;
 
     /**
+     * @var array
+     */
+    protected $generateDimensions = [];
+
+    /**
      * @var MediaOptions
      */
     protected $mediaOptions;
@@ -55,11 +60,27 @@ abstract class AbstractAddCommand extends AbstractCommand
     }
 
     /**
+     * @param array $generateDimensions
+     * @return $this
+     */
+    public function setGenerateDimensions($generateDimensions)
+    {
+        $this->generateDimensions = $generateDimensions;
+        return $this;
+    }
+    
+    /**
      * @param string $destination
      * @return boolean
      */
     abstract protected function moveFile($destination);
 
+    /**
+     * @param string $filename
+     * @param string $source
+     * @return Media|null
+     * @throws \Exception
+     */
     protected function addMedia($filename, $source)
     {
         $directory = $this->getTargetDir();
@@ -94,20 +115,29 @@ abstract class AbstractAddCommand extends AbstractCommand
         }
 
         if ($this->resizeOriginalDimension !== null) {
-
-
+            
 
         }
-
 
         $this
             ->getServiceManager()
             ->get('Media42\EventManager')
             ->trigger(MediaEvent::EVENT_ADD, $media);
 
-
         if (substr($media->getMimeType(), 0, 6) == "image/") {
-            foreach (array_keys($this->mediaOptions->getDimensions()) as $dimension) {
+            foreach ($this->mediaOptions->getDimensions() as $dimension) {
+                
+                if (!array_key_exists('pre_generate', $dimension) || $dimension['pre_generate'] === true) {
+                    
+                    /* @var ImageResizeCommand $cmd */
+                    $cmd = $this->getCommand(ImageResizeCommand::class);
+                    $cmd->setMedia($media)
+                        ->setDimension($dimension)
+                        ->run();    
+                }
+            }
+
+            foreach ($this->generateDimensions as $dimension) {
                 /* @var ImageResizeCommand $cmd */
                 $cmd = $this->getCommand(ImageResizeCommand::class);
                 $cmd->setMedia($media)

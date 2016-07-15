@@ -9,10 +9,12 @@
 
 namespace Media42\Command;
 
+use Media42\MediaOptions;
 use Media42\Model\Media;
 use Core42\Command\AbstractCommand;
 use Imagine\Image\Box;
 use Imagine\Image\ImagineInterface;
+use Media42\TableGateway\MediaTableGateway;
 
 class ImageResizeCommand extends AbstractCommand
 {
@@ -25,6 +27,11 @@ class ImageResizeCommand extends AbstractCommand
      * @var Media
      */
     protected $media;
+
+    /**
+     * @var MediaOptions
+     */
+    protected $mediaOptions;
 
     /**
      * @var ImagineInterface
@@ -72,12 +79,22 @@ class ImageResizeCommand extends AbstractCommand
     }
 
     /**
+     * @param array $dimension
+     * @return $this
+     */
+    public function setDimension($dimension)
+    {
+        $this->dimension = $dimension;
+        return $this;
+    }
+
+    /**
      * @throws \Exception
      */
     protected function preExecute()
     {
         if ($this->mediaId > 0) {
-            $this->media = $this->getTableGateway('Admin42\Media')->selectByPrimary((int) $this->mediaId);
+            $this->media = $this->getTableGateway(MediaTableGateway::class)->selectByPrimary((int) $this->mediaId);
         }
 
         if (empty($this->media)) {
@@ -86,14 +103,15 @@ class ImageResizeCommand extends AbstractCommand
             return;
         }
 
-        $mediaConfig = $this->getServiceManager()->get('config')['media'];
-        if (!isset($mediaConfig['images']['dimensions'][$this->dimensionName])) {
-            $this->addError("dimensions", "dimensionName invalid");
-
-            return;
+        $this->mediaOptions = $this->getServiceManager()->get(MediaOptions::class);
+        if ($this->dimension === null) {
+            $this->dimension = $this->mediaOptions->getDimension($this->dimensionName);
         }
 
-        $this->dimension = $mediaConfig['images']['dimensions'][$this->dimensionName];
+        if (!$this->dimension === null) {
+            $this->addError("dimensions", "dimensionName invalid");
+            return;
+        }
 
         $this->imagine = $this->getServiceManager()->get('Imagine');
     }
@@ -105,57 +123,85 @@ class ImageResizeCommand extends AbstractCommand
     {
         $filenameParts = explode(".", $this->media->getFilename());
 
-        $extension = array_pop($filenameParts);
-        $filename = implode(".", $filenameParts);
+        if (count($filenameParts) == 1) {
+            $extension = '';
+            $filename = $filenameParts[0];
+        } else {
+            $extension = array_pop($filenameParts);
+            $filename = implode(".", $filenameParts);
+        }
 
         $filename .= '-'
             . (($this->dimension['width'] == 'auto') ? '000' : $this->dimension['width'])
             . 'x'
-            . (($this->dimension['height'] == 'auto') ? '000' : $this->dimension['height']);
+            . (($this->dimension['height'] == 'auto') ? '000' : $this->dimension['height'])
+            . '.' . $extension;
+
+        $fullPath = $this->mediaOptions->getPath() . $this->media->getDirectory() . $filename;
 
         $media = new Media();
-        $media->setFilename($filename . '.' . $extension)
+        $media->setFilename($filename)
             ->setDirectory($this->media->getDirectory());
 
-        if (file_exists($media->getDirectory() . $media->getFilename())) {
+        if (file_exists($fullPath)) {
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
-            $media->setMimeType(finfo_file($finfo, $media->getDirectory() . $media->getFilename()));
-            $media->setSize(filesize($media->getDirectory() . $media->getFilename()));
+            $media->setMimeType(finfo_file($finfo, $fullPath));
+            $media->setSize(filesize($fullPath));
 
             return $media;
         }
 
-        $image = $this->imagine->open($this->media->getDirectory() . $this->media->getFilename());
-        $imageSize = $image->getSize();
+        $image = $this->imagine->open($this->mediaOptions->getPath() . $this->media->getDirectory() . $this->media->getFilename());
 
-        $imageRatio = $imageSize->getWidth() / $imageSize->getHeight();
+        $resizeType = (!empty($this->dimension['mode'])) ? $this->dimension['mode'] : 'crop';
+        switch($resizeType) {
+            case 'crop':
 
-        if ($this->dimension['width'] != "auto" && $this->dimension['height'] != "auto") {
-            $dimensionRatio = $this->dimension['width'] / $this->dimension['height'];
+                $imageSize = $image->getSize();
 
-            if ($imageRatio < $dimensionRatio) {
-                $boxWidth = $imageSize->getWidth();
-                $boxHeight = round($imageSize->getWidth()/ $dimensionRatio);
-            } elseif ($imageRatio > $dimensionRatio) {
-                $boxHeight = $imageSize->getHeight();
-                $boxWidth = round($imageSize->getHeight() * $dimensionRatio);
-            } else {
-                $boxWidth = $imageSize->getWidth();
-                $boxHeight = $imageSize->getHeight();
-            }
-        } else {
-            $boxWidth = $imageSize->getWidth();
-            $boxHeight = $imageSize->getHeight();
+                $imageRatio = $imageSize->getWidth() / $imageSize->getHeight();
+
+                if ($this->dimension['width'] != "auto" && $this->dimension['height'] != "auto") {
+                    $dimensionRatio = $this->dimension['width'] / $this->dimension['height'];
+
+                    if ($imageRatio < $dimensionRatio) {
+                        $boxWidth = $imageSize->getWidth();
+                        $boxHeight = round($imageSize->getWidth()/ $dimensionRatio);
+                    } elseif ($imageRatio > $dimensionRatio) {
+                        $boxHeight = $imageSize->getHeight();
+                        $boxWidth = round($imageSize->getHeight() * $dimensionRatio);
+                    } else {
+                        $boxWidth = $imageSize->getWidth();
+                        $boxHeight = $imageSize->getHeight();
+                    }
+                } else {
+                    $boxWidth = $imageSize->getWidth();
+                    $boxHeight = $imageSize->getHeight();
+                }
+
+                /** @var ImageCropCommand $imageCropCmd */
+                $imageCropCmd = $this->getCommand(ImageCropCommand::class);
+                return $imageCropCmd->setBoxWidth($boxWidth)
+                    ->setBoxHeight($boxHeight)
+                    ->setDimension($this->dimension)
+                    ->setOffsetX(0)
+                    ->setOffsetY(0)
+                    ->setMedia($this->media)
+                    ->run();
+                
+                break;
+            case 'resize':
+
+                $width = (($this->dimension['width'] == 'auto') ? PHP_INT_MAX : $this->dimension['width']);
+                $height = (($this->dimension['height'] == 'auto') ? PHP_INT_MAX : $this->dimension['height']);
+                
+                $image->thumbnail(new Box($width, $height))->save($fullPath, [
+                    'jpeg_quality' => 75,
+                    'png_compression_level' => 7
+                ]);
+                break;
         }
 
-        /** @var ImageCropCommand $imageCropCmd */
-        $imageCropCmd = $this->getCommand('Media42\Media\ImageCrop');
-        return $imageCropCmd->setBoxWidth($boxWidth)
-            ->setBoxHeight($boxHeight)
-            ->setDimensionName($this->dimensionName)
-            ->setOffsetX(0)
-            ->setOffsetY(0)
-            ->setMedia($this->media)
-            ->run();
+        return $media;
     }
 }

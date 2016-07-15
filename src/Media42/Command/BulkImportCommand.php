@@ -76,7 +76,9 @@ class BulkImportCommand extends AbstractCommand
 
             if (is_file($this->directory . $file)) {
                 $cmd->setFile($this->directory . $file);
-                $cmd->run();
+                $media = $cmd->run();
+
+                $this->consoleOutput($file . ' - ' . $media->getId());
             }
         }
     }

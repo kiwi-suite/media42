@@ -9,7 +9,7 @@
 
 namespace Media42\Service;
 
-use Admin42\Media\MediaEvent;
+use Media42\MediaEvent;
 use Zend\EventManager\EventManager;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;

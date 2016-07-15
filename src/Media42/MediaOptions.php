@@ -98,6 +98,10 @@ class MediaOptions extends AbstractOptions
     {
         $dimensions = [];
 
+        if ($includeSystem === true) {
+            return $this->images['dimensions'];
+        }
+
         foreach ($this->images['dimensions'] as $name => $_dimensions) {
             if ($includeSystem === false
                 && array_key_exists('system', $_dimensions)
