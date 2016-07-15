@@ -14,6 +14,7 @@ use Imagine\Image\Box;
 use Imagine\Image\ImagineInterface;
 use Imagine\Image\Point;
 use Media42\MediaEvent;
+use Media42\MediaOptions;
 use Media42\Model\Media;
 use Media42\TableGateway\MediaTableGateway;
 use Zend\Json\Json;
@@ -29,6 +30,11 @@ class ImageCropCommand extends AbstractCommand
      * @var Media
      */
     protected $media;
+
+    /**
+     * @var MediaOptions
+     */
+    protected $mediaOptions;
 
     /**
      * @var ImagineInterface
@@ -72,7 +78,6 @@ class ImageCropCommand extends AbstractCommand
     public function setMediaId($mediaId)
     {
         $this->mediaId = $mediaId;
-
         return $this;
     }
 
@@ -83,7 +88,6 @@ class ImageCropCommand extends AbstractCommand
     public function setMedia(Media $media)
     {
         $this->media = $media;
-
         return $this;
     }
 
@@ -94,7 +98,16 @@ class ImageCropCommand extends AbstractCommand
     public function setDimensionName($dimensionName)
     {
         $this->dimensionName = $dimensionName;
+        return $this;
+    }
 
+    /**
+     * @param array $dimension
+     * @return $this
+     */
+    public function setDimension($dimension)
+    {
+        $this->dimension = $dimension;
         return $this;
     }
 
@@ -105,7 +118,6 @@ class ImageCropCommand extends AbstractCommand
     public function setBoxWidth($boxWidth)
     {
         $this->boxWidth = $boxWidth;
-
         return $this;
     }
 
@@ -116,7 +128,6 @@ class ImageCropCommand extends AbstractCommand
     public function setBoxHeight($boxHeight)
     {
         $this->boxHeight = $boxHeight;
-
         return $this;
     }
 
@@ -127,7 +138,6 @@ class ImageCropCommand extends AbstractCommand
     public function setOffsetX($offsetX)
     {
         $this->offsetX = $offsetX;
-
         return $this;
     }
 
@@ -138,7 +148,6 @@ class ImageCropCommand extends AbstractCommand
     public function setOffsetY($offsetY)
     {
         $this->offsetY = $offsetY;
-
         return $this;
     }
 
@@ -157,14 +166,16 @@ class ImageCropCommand extends AbstractCommand
             return;
         }
 
-        $mediaConfig = $this->getServiceManager()->get('config')['media'];
-        if (!isset($mediaConfig['images']['dimensions'][$this->dimensionName])) {
-            $this->addError("dimensions", "dimensionName invalid");
+        $this->mediaOptions = $this->getServiceManager()->get(MediaOptions::class);
 
-            return;
+        if ($this->dimension === null) {
+            $this->dimension = $this->mediaOptions->getDimension($this->dimensionName);
         }
 
-        $this->dimension = $mediaConfig['images']['dimensions'][$this->dimensionName];
+        if (!$this->dimension === null) {
+            $this->addError("dimensions", "dimensionName invalid");
+            return;
+        }
 
         $this->imagine = $this->getServiceManager()->get('Imagine');
 
@@ -179,6 +190,8 @@ class ImageCropCommand extends AbstractCommand
      */
     protected function execute()
     {
+        $sourceFullPath = $this->mediaOptions->getPath() . $this->media->getDirectory() . $this->media->getFilename();
+
         $filenameParts = explode(".", $this->media->getFilename());
 
         $extension = array_pop($filenameParts);
@@ -187,21 +200,24 @@ class ImageCropCommand extends AbstractCommand
         $filename .= '-'
             . (($this->dimension['width'] == 'auto') ? '000' : $this->dimension['width'])
             . 'x'
-            . (($this->dimension['height'] == 'auto') ? '000' : $this->dimension['height']);
+            . (($this->dimension['height'] == 'auto') ? '000' : $this->dimension['height'])
+            . '.' . $extension;
+
+        $fullPath = $this->mediaOptions->getPath() . $this->media->getDirectory() . $filename;
 
         $media = new Media();
-        $media->setFilename($filename . '.' . $extension)
+        $media->setFilename($filename)
             ->setDirectory($this->media->getDirectory());
 
         $width = (($this->dimension['width'] == 'auto') ? PHP_INT_MAX : $this->dimension['width']);
         $height = (($this->dimension['height'] == 'auto') ? PHP_INT_MAX : $this->dimension['height']);
 
         $this->imagine
-            ->open($this->media->getDirectory() . $this->media->getFilename())
+            ->open($sourceFullPath)
             ->crop(new Point($this->offsetX, $this->offsetY), new Box($this->boxWidth, $this->boxHeight))
             ->thumbnail(new Box($width, $height))
             ->save(
-                $media->getDirectory() . $media->getFilename(),
+                $fullPath,
                 [
                     'jpeg_quality' => 75,
                     'png_compression_level' => 7
@@ -209,8 +225,8 @@ class ImageCropCommand extends AbstractCommand
             );
 
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $media->setMimeType(finfo_file($finfo, $media->getDirectory() . $media->getFilename()));
-        $media->setSize(filesize($media->getDirectory() . $media->getFilename()));
+        $media->setMimeType(finfo_file($finfo, $fullPath));
+        $media->setSize(filesize($fullPath));
 
 
         $meta = $this->media->getMeta();

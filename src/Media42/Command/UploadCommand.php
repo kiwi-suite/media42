@@ -22,13 +22,42 @@ class UploadCommand extends AbstractAddCommand
     private $uploadData;
 
     /**
+     * @var string|null
+     */
+    private $filename;
+
+    /**
+     * @var bool
+     */
+    protected $checkFileUpload = true;
+    
+    /**
      * @param array $uploadData
      * @return $this
      */
     public function setUploadData(array $uploadData)
     {
         $this->uploadData = $uploadData;
+        return $this;
+    }
 
+    /**
+     * @param string $filename
+     * @return $this
+     */
+    public function setFilename($filename)
+    {
+        $this->filename = $filename;
+        return $this;
+    }
+
+    /**
+     * @param boolean $checkFileUpload
+     * @return $this
+     */
+    public function setCheckFileUpload($checkFileUpload)
+    {
+        $this->checkFileUpload = $checkFileUpload;
         return $this;
     }
 
@@ -54,6 +83,10 @@ class UploadCommand extends AbstractAddCommand
         if (!in_array($this->category, $categories)) {
             $this->category = "default";
         }
+
+        if (empty($this->filename)) {
+            $this->filename = $this->uploadData['name'];
+        }
     }
 
     /**
@@ -61,7 +94,7 @@ class UploadCommand extends AbstractAddCommand
      */
     protected function execute()
     {
-        $media = $this->addMedia($this->uploadData['name'], $this->uploadData['tmp_name']);
+        $media = $this->addMedia($this->filename, $this->uploadData['tmp_name']);
 
         return $media;
     }
@@ -72,7 +105,11 @@ class UploadCommand extends AbstractAddCommand
     protected function moveFile($destination)
     {
         ErrorHandler::start();
-        $result = move_uploaded_file($this->uploadData['tmp_name'], $destination);
+        if ($this->checkFileUpload) {
+            $result = move_uploaded_file($this->uploadData['tmp_name'], $destination);    
+        } else {
+            $result = rename($this->uploadData['tmp_name'], $destination);
+        }
         $warningException = ErrorHandler::stop();
         if (!$result || null !== $warningException) {
             $this->addError('uploadData', 'error at moving uploaded file');

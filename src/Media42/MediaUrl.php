@@ -34,6 +34,7 @@ class MediaUrl extends AbstractHelper
     /**
      * @param MediaTableGateway $mediaTableGateway
      * @param MediaOptions $mediaOptions
+     * @param StorageInterface $cache
      */
     public function __construct(
         MediaTableGateway $mediaTableGateway,
@@ -41,9 +42,7 @@ class MediaUrl extends AbstractHelper
         StorageInterface $cache
     ) {
         $this->mediaTableGateway = $mediaTableGateway;
-
         $this->mediaOptions = $mediaOptions;
-
         $this->cache = $cache;
     }
 

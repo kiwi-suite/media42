@@ -12,7 +12,7 @@ return [
     'media' => [
         'upload_host' => '',
         'path' => 'data/media/',
-        'url' => '/media/',
+        'url' => '/media-y/',
 
         'categories' => [
             'default' => 'media.category.default'
@@ -32,6 +32,12 @@ return [
         ],
     ],
 
+    'admin' => [
+        'angular' => [
+            'modules' => ['media42']
+        ],
+    ],
+
     'service_manager' => [
         'factories' => [
             'Imagine' => 'Admin42\Imagine\Service\ImagineFactory',
@@ -41,13 +47,14 @@ return [
 
             'Media42\EventManager' => EventManagerFactory::class,
 
-            \Media42\Link\Adapter\MediaLink::class => \Media42\Link\Adapter\Service\MediaLinkFactory::class,
+             \Media42\Link\Adapter\MediaLink::class => \Media42\Link\Adapter\Service\MediaLinkFactory::class,
         ],
+        'alias' => []
     ],
 
     'link' => [
         'adapter' => [
-            'media'  => 'Admin42\Link\MediaLink',
+            'media'  => 'Media42\Link\MediaLink',
         ],
     ],
 

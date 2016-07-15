@@ -13,10 +13,7 @@
             <div class="panel-footer">
                 <div class="form-group">
                     <div class="col-sm-offset-2 col-md-10">
-                        <button type="submit" class="btn btn-primary">
-                            <span class="fa fa-save"></span>
-                            <?= $this->translate('button.save', 'admin') ?>
-                        </button>
+                        <submit submit-text="<?= $this->translate('button.save', 'admin') ?>"></submit>
 
                         <delete
                             url="<?= $this->url('admin/media/delete') ?>"
@@ -113,7 +110,7 @@ $this->admin()->addJsonTemplate($jsonDataId, [
                                         <div class="col-md-4 text-right">
                                             <button
                                                 ng-if="hasChanges[name] && checkImageSize(data)"
-                                                class="btn btn-success btn-sm"
+                                                class="btn btn-primary btn-sm"
                                                 ng-click="saveCroppedImage(name, '<?= $this->url('admin/media/crop', ['id' => $this->media->getId(), 'dimension' => '{{ name }}'])?>')">
                                                 <span class="fa fa-save"></span>
                                                 <?= $this->translate('button.save', 'admin') ?>

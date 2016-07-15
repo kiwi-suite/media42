@@ -1,5 +1,6 @@
 angular.module('media42')
     .service('MediaService', ['jsonCache', function(jsonCache) {
+        
         this.getMediaUrl = function(directory, filename, mimeType, dimension) {
             if (angular.isUndefined(directory) || angular.isUndefined(filename)) {
                 return "";

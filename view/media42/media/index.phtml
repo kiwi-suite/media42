@@ -79,7 +79,7 @@
             </div>
         </div>
         <div class="panel-footer text-right" collapse="isCollapsed">
-            <button type="button" class="btn btn-addon btn-success" ng-click="uploader.uploadAll()" ng-hide="!uploader.getNotUploadedItems().length">
+            <button type="button" class="btn btn-addon btn-primary" ng-click="uploader.uploadAll()" ng-hide="!uploader.getNotUploadedItems().length">
                 <i class="fa fa-arrow-circle-o-up"></i> <?= $this->translate('button.upload_all', 'admin')?>
             </button>
             <button type="button" class="btn btn-addon btn-warning" ng-click="uploader.cancelAll()" ng-hide="!uploader.isUploading">
@@ -118,40 +118,36 @@
             <tr>
                 <td colspan="6">
                     <div class="row">
-                        <div ng-repeat="row in collection" class="<?= ($this->params()->fromRoute('referrer') == "index") ? "col-xs-6 col-sm-4 col-md-2 col-lg-2" : "col-xs-6 col-sm-6 col-md-4 col-lg-4"?>">
-                            <div class="item m-t-md">
-                                <?php if ($this->params()->fromRoute('referrer') == "index"): ?>
-                                <a href="<?= $this->url('admin/media/edit', ['id' => '{{row.id}}'])?>">
-                                <?php else: ?>
-                                <a ng-click="selectMedia(row)">
-                                <?php endif; ?>
-                                    <div class="pos-rlt b-a bg-white" style="max-width: 300px; height: 200px; overflow: hidden;">
-                                        <div ng-show="selectedMedia == row.id" class="bottom">
-                                            <div class="pull-right m-b-sm m-l-sm badge bg-success">
-                                                <i class="fa fa-check"></i>
-                                            </div>
-                                        </div>
-                                        <img ng-if="isImage(row)" ng-src="{{ getSrc(row, 'admin_thumbnail') }}">
-                                        <div ng-if="!isImage(row)" class="center text-center m-t-n w-full">
-                                            <i class="fa fa-5x" ng-class="getDocumentClass(row)"></i>
-                                        </div>
-                                    </div>
-                                    <div class="row m-t-xs">
-                                        <div class="text-ellipsis col-sm-<?= ($this->params()->fromRoute('referrer') == "index" ? 12 : 8)?>">
-                                            <i ng-if="row.meta != '[]'" class="fa fa-crop"></i> {{ row.filename }}
-                                        </div>
+                        <div ng-repeat="row in collection" class="<?= ($this->params()->fromRoute('referrer') == "index") ? "col-xs-6 col-sm-4 col-md-3 col-lg-2" : "col-xs-6 col-sm-6 col-md-4 col-lg-4"?>">
+                            <div class="item m-t-md" style="overflow: hidden;">
+                                <div class="pos-rlt bg-for-transparent">
+                                    <div class="top w-full">
+                                        <a ng-if="isImage(row)" class="m-l-sm m-t-sm btn btn-rounded btn-icon btn-default" ng-href="{{ getSrc(row) }}" lightbox>
+                                            <i class="fa fa-search-plus"></i>
+                                        </a>
+                                        <a class="m-t-sm btn btn-rounded btn-icon btn-default" ng-href="<?= $this->url('admin/media/edit', ['id' => '{{row.id}}'])?>"<?= ($this->params()->fromRoute('referrer') != "index") ? ' target="_blank"': ''?>>
+                                            <i class="fa fa-edit"></i>
+                                        </a>
                                         <?php if ($this->params()->fromRoute('referrer') != "index"): ?>
-                                        <div class="col-sm-4 text-right">
-                                            <a class="btn btn-default btn-xs" ng-href="<?= $this->url('admin/media/edit', ['id' => '{{row.id}}'])?>" target="_blank">
-                                                <span class="fa fa-edit"></span>
+                                            <a class="m-t-sm btn btn-rounded btn-icon btn-default" ng-class="{'btn-success': selectedMedia == row.id}" ng-click="selectMedia(row)">
+                                                <i class="fa fa-check"></i>
                                             </a>
-                                            <a class="btn btn-default btn-xs" ng-href="{{ getSrc(row) }}" target="_blank">
-                                                <span class="fa fa-download"></span>
-                                            </a>
-                                        </div>
                                         <?php endif; ?>
                                     </div>
-                                </a>
+                                    <div class="r-b r-2x bottom w-full bg-blacker-opacity text-white wrapper-xs">
+                                        <span class="text-xs text-ellipsis">
+                                            <i ng-show="selectedMedia == row.id" class="fa fa-check text-success"></i>
+                                            {{ row.filename }}
+                                        </span>
+                                    </div>
+                                    <div ng-if="!isImage(row)" class="center text-center m-t-n w-full r-2x">
+                                        <i class="fa fa-5x" ng-class="getDocumentClass(row)"></i>
+                                    </div>
+
+                                    <img ng-if="isImage(row)" ng-src="{{ getSrc(row, 'admin_thumbnail') }}" class="img-full r r-2x">
+                                    <img ng-if="!isImage(row)" src="<?= $this->basePath('assets/admin/core/images/document-placeholder.jpg') ?>" class="img-full r r-2x">
+
+                                </div>
                             </div>
                         </div>
                     </div>
