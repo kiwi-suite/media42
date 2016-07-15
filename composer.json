@@ -9,7 +9,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Media42\\": "src/Media42/"
+            "Media42\\": "src/"
         }
     }
 }
