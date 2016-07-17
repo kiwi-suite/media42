@@ -1,17 +1,22 @@
 <?php
 namespace Media42;
 
+use Core42\Mvc\Router\Http\AngularSegment;
+use Media42\Controller\MediaController;
+use Zend\Router\Http\Literal;
+use Zend\Router\Http\Segment;
+
 return [
     'router' => [
         'routes' => [
             'admin' => [
                 'child_routes' => [
                     'media' => [
-                        'type' => 'Zend\Mvc\Router\Http\Segment',
+                        'type' => Segment::class,
                         'options' => [
                             'route' => 'media/[:referrer/[:category/]]',
                             'defaults' => [
-                                'controller' => __NAMESPACE__ . '\Media',
+                                'controller' => MediaController::class,
                                 'action' => 'index',
                                 'referrer' => 'index',
                                 'category' => 'default',
@@ -23,7 +28,7 @@ return [
                         'may_terminate' => true,
                         'child_routes' => [
                             'upload' => [
-                                'type' => 'Zend\Mvc\Router\Http\Literal',
+                                'type' => Literal::class,
                                 'options' => [
                                     'route' => 'upload/',
                                     'defaults' => [
@@ -32,7 +37,7 @@ return [
                                 ],
                             ],
                             'crop' => [
-                                'type' => 'Core42\Mvc\Router\Http\AngularSegment',
+                                'type' => AngularSegment::class,
                                 'options' => [
                                     'route' => 'crop/:id/:dimension/',
                                     'defaults' => [
@@ -41,7 +46,7 @@ return [
                                 ],
                             ],
                             'edit' => [
-                                'type' => 'Core42\Mvc\Router\Http\AngularSegment',
+                                'type' => AngularSegment::class,
                                 'options' => [
                                     'route' => 'edit/:id/',
                                     'defaults' => [
@@ -50,7 +55,7 @@ return [
                                 ],
                             ],
                             'delete' => [
-                                'type' => 'Core42\Mvc\Router\Http\AngularSegment',
+                                'type' => AngularSegment::class,
                                 'options' => [
                                     'route' => 'delete/',
                                     'defaults' => [
@@ -59,7 +64,7 @@ return [
                                 ],
                             ],
                             'stream' => [
-                                'type' => 'Core42\Mvc\Router\Http\AngularSegment',
+                                'type' => AngularSegment::class,
                                 'options' => [
                                     'route' => 'stream/:id/[:dimension/]',
                                     'defaults' => [

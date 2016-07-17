@@ -1,5 +1,5 @@
 angular.module('media42')
-    .controller('FileSelectorController', ['$scope', '$attrs', 'jsonCache', '$modal', 'MediaService', function ($scope, $attrs, jsonCache, $modal, MediaService) {
+    .controller('FileSelectorController', ['$scope', '$attrs', 'jsonCache', '$uibModal', 'MediaService', function ($scope, $attrs, jsonCache, $uibModal, MediaService) {
         $scope.media = jsonCache.get($attrs.jsonDataId);
 
         $scope.tabs = {
@@ -29,7 +29,7 @@ angular.module('media42')
         };
 
         $scope.selectMedia = function() {
-            var modalInstance = $modal.open({
+            var modalInstance = $uibModal.open({
                 animation: true,
                 templateUrl: $attrs.modalTemplate,
                 controller: 'MediaModalSelectorController',
@@ -44,10 +44,10 @@ angular.module('media42')
 
             });
         };
-}]);
+    }]);
 
 angular.module('media42')
-    .controller('MediaModalSelectorController', ['$scope', '$modalInstance', function ($scope, $modalInstance) {
+    .controller('MediaModalSelectorController', ['$scope', '$uibModalInstance', function ($scope, $uibModalInstance) {
         var selectedMedia = null;
 
 
@@ -63,10 +63,10 @@ angular.module('media42')
         };
 
         $scope.ok = function () {
-            $modalInstance.close(selectedMedia);
+            $uibModalInstance.close(selectedMedia);
         };
 
         $scope.cancel = function () {
-            $modalInstance.dismiss('cancel');
+            $uibModalInstance.dismiss('cancel');
         };
     }]);

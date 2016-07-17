@@ -46,9 +46,9 @@ class MediaSelector extends AbstractSmartTableSelector
     protected function getDatabaseTypeMap()
     {
         return [
-            'id'      => 'Mysql/Integer',
-            'updated' => 'Mysql/Datetime',
-            'created' => 'Mysql/Datetime',
+            'id'      => 'Integer',
+            'updated' => 'DateTime',
+            'created' => 'DateTime',
         ];
     }
 

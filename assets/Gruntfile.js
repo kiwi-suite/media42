@@ -12,7 +12,7 @@ module.exports = function(grunt) {
         },
 
         concurrent: {
-            all: ['compile-vendor-js', 'compile-app-js']
+            all: ['compile-vendor-js', 'compile-app-js', 'less:app']
         },
 
         concat: {
@@ -23,7 +23,6 @@ module.exports = function(grunt) {
                 src: [
                     '<%= vendor_dir %>/angular-file-upload/dist/angular-file-upload.min.js',
                     '<%= vendor_dir %>/cropper/dist/cropper.js',
-                    '<%= vendor_dir %>/ng-cropper/dist/ngCropper.js'
                 ],
                 dest: '<%= dist %>/js/vendor.js'
             },
@@ -64,6 +63,20 @@ module.exports = function(grunt) {
             ]
         },
 
+        less: {
+            options: {
+                compress: true,
+                cleancss: true
+            },
+            app: {
+                files: {
+                    '<%= dist %>/css/media42.min.css': [
+                        '<%= vendor_dir %>/cropper/dist/cropper.css'
+                    ]
+                }
+            }
+        },
+
         watch: {
             grunt: {
                 files: ['Gruntfile.js', 'bower.json'],
@@ -80,6 +93,7 @@ module.exports = function(grunt) {
     grunt.registerTask('default', ['bower', 'concurrent:all']);
     grunt.registerTask('compile-vendor-js', ['concat:vendor', 'uglify:vendor', 'clean:vendorjs']);
     grunt.registerTask('compile-app-js', ['concat:app', 'uglify:app', 'clean:appjs']);
+    grunt.registerTask('compile-css', ['less:app']);
     grunt.registerTask('clear', ['clean:all']);
 
     require('load-grunt-tasks')(grunt);

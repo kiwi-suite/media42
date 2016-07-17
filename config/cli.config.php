@@ -1,10 +1,14 @@
 <?php
+namespace Media42;
+
+use Media42\Command\BulkImportCommand;
+use Media42\Command\RegenerateCommand;
 
 return [
     'cli' => [
         'media-import' => [
             'route'                     => '<dir> [--category=]',
-            'command-name'              => 'Media42\BulkImport',
+            'command-name'              => BulkImportCommand::class,
             'description'               => 'bulk import media files from a directory',
             'short_description'         => 'bulk import media files from a directory',
             'options_descriptions'      => [
@@ -14,7 +18,7 @@ return [
 
         'media-regenerate-images' => [
             'route'                     => '[--force] [--dimension=] [--category=]',
-            'command-name'              => 'Media42\Regenerate',
+            'command-name'              => RegenerateCommand::class,
             'description'               => 'Regenerate all Images',
             'short_description'         => 'Regenerate all Images',
         ],

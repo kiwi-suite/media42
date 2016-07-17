@@ -1,4 +1,4 @@
-angular.module('admin42')
+angular.module('media42')
     .controller('MediaController', ['$scope', 'FileUploader', '$attrs', '$http', '$sessionStorage', '$templateCache', 'toaster', 'MediaService', function ($scope, FileUploader, $attrs, $http, $sessionStorage, $templateCache, toaster, MediaService) {
         $templateCache.put('template/smart-table/pagination.html',
             '<nav ng-if="numPages && pages.length >= 2"><ul class="pagination">' +
@@ -22,8 +22,6 @@ angular.module('admin42')
         $scope.errorFiles = [];
 
         $scope.category = $attrs.category;
-
-
 
         if (angular.isDefined($attrs.persist) && $attrs.persist.length > 0) {
             persistNamespace = $attrs.persist;
@@ -97,15 +95,15 @@ angular.module('admin42')
 
             isInitialCall = false;
             $http.post(url, tableState).
-                success(function(data, status, headers, config) {
-                    $scope.isLoading = false;
+            success(function(data, status, headers, config) {
+                $scope.isLoading = false;
 
-                    $scope.collection = data.data;
+                $scope.collection = data.data;
 
-                    $scope.displayedPages = data.meta.displayedPages;
-                    tableState.pagination.numberOfPages = data.meta.displayedPages;
-                }).
-                error(function(data, status, headers, config) {
-                });
+                $scope.displayedPages = data.meta.displayedPages;
+                tableState.pagination.numberOfPages = data.meta.displayedPages;
+            }).
+            error(function(data, status, headers, config) {
+            });
         }
-}]);
+    }]);

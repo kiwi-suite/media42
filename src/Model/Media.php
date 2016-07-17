@@ -1,12 +1,4 @@
 <?php
-/**
- * media42 (www.raum42.at)
- *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2016 raum42 OG (http://www.raum42.at)
- *
- */
-
 namespace Media42\Model;
 
 use Core42\Model\AbstractModel;
@@ -43,7 +35,7 @@ class Media extends AbstractModel
     /**
      * @var array
      */
-    protected $properties = [
+    public $properties = [
         'id',
         'directory',
         'filename',

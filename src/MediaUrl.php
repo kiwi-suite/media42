@@ -12,9 +12,8 @@ namespace Media42;
 use Media42\Model\Media;
 use Media42\TableGateway\MediaTableGateway;
 use Zend\Cache\Storage\StorageInterface;
-use Zend\View\Helper\AbstractHelper;
 
-class MediaUrl extends AbstractHelper
+class MediaUrl
 {
     /**
      * @var MediaTableGateway;

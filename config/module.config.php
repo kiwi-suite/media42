@@ -1,18 +1,16 @@
 <?php
 namespace Media42;
 
-use Media42\MediaEvent;
-use Media42\MediaUrl;
-use Media42\Service\EventManagerFactory;
-use Media42\Service\MediaOptionsFactory;
-use Media42\Service\MediaUrlFactory;
+use Media42\Link\Adapter\MediaLink;
+use Media42\View\Helper\Service\MediaFactory;
+use Media42\View\Helper\Service\MediaUrlFactory;
 
 return [
 
     'media' => [
         'upload_host' => '',
         'path' => 'data/media/',
-        'url' => '/media-y/',
+        'url' => '/media/',
 
         'categories' => [
             'default' => 'media.category.default'
@@ -38,23 +36,9 @@ return [
         ],
     ],
 
-    'service_manager' => [
-        'factories' => [
-            'Imagine' => 'Admin42\Imagine\Service\ImagineFactory',
-
-             MediaOptions::class   => MediaOptionsFactory::class,
-             MediaUrl::class       => MediaUrlFactory::class,
-
-            'Media42\EventManager' => EventManagerFactory::class,
-
-             \Media42\Link\Adapter\MediaLink::class => \Media42\Link\Adapter\Service\MediaLinkFactory::class,
-        ],
-        'alias' => []
-    ],
-
     'link' => [
         'adapter' => [
-            'media'  => 'Media42\Link\MediaLink',
+            'media'  => MediaLink::class,
         ],
     ],
 
@@ -66,15 +50,15 @@ return [
 
     'view_helpers' => [
         'factories' => [
-            'media'            => \Media42\View\Helper\Service\MediaFactory::class,
-            'mediaUrl'         => \Media42\View\Helper\Service\MediaUrlFactory::class,
+            'media'            => MediaFactory::class,
+            'mediaUrl'         => MediaUrlFactory::class,
         ],
     ],
 
     'assets' => [
         __NAMESPACE__ => [
             'target' => 'public/assets/media42/core',
-            'source' => 'module/media42/assets/dist/',
+            'source' => 'vendor/fruit42/media42/assets/dist/',
         ],
     ],
 

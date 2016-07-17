@@ -32,6 +32,7 @@ class Module implements
             include __DIR__ . '/../config/cli.config.php',
             include __DIR__ . '/../config/caches.config.php',
             include __DIR__ . '/../config/navigation.config.php',
+            include __DIR__ . '/../config/services.config.php',
             include __DIR__ . '/../config/routing.config.php'
         );
     }
@@ -58,13 +59,16 @@ class Module implements
                     return;
                 }
 
-                $viewHelperManager = $serviceManager->get('viewHelperManager');
+                $viewHelperManager = $serviceManager->get('ViewHelperManager');
 
                 $headScript = $viewHelperManager->get('headScript');
+                $headLink = $viewHelperManager->get('headLink');
                 $basePath = $viewHelperManager->get('basePath');
 
                 $headScript->appendFile($basePath('/assets/media42/core/js/vendor.min.js'));
                 $headScript->appendFile($basePath('/assets/media42/core/js/media42.min.js'));
+
+                $headLink->appendStylesheet($basePath('/assets/media42/core/css/media42.min.css'));
 
                 $admin = $viewHelperManager->get('admin');
 

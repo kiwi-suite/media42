@@ -94,12 +94,13 @@ class MediaController extends AbstractAdminController
             $editForm->setData($media->toArray());
         }
 
-        $mediaOptions = $this->getServiceLocator()->get(MediaOptions::class);
+        /** @var MediaOptions $mediaOptions */
+        $mediaOptions = $this->getServiceManager()->get(MediaOptions::class);
 
         $imageSize = null;
         if (substr($media->getMimeType(), 0, 6) == "image/") {
-            $imagine = $this->getServiceLocator()->get('Imagine');
-            $box = $imagine->open($media->getDirectory() . $media->getFilename())->getSize();
+            $imagine = $this->getServiceManager()->get('Imagine');
+            $box = $imagine->open($mediaOptions->getPath() . $media->getDirectory() . $media->getFilename())->getSize();
             $imageSize = [
                 'width' => $box->getWidth(),
                 'height' => $box->getHeight(),
