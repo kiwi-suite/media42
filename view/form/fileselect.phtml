@@ -1,0 +1,85 @@
+<?php
+$modalTemplate = 'mediaModalSelectorContent' . md5("allfiles") . '.html';
+$jsonDataId = uniqid('form/mediaselect/') . '.json';
+
+$media = [];
+if ($this->element->getValue() > 0) {
+    $media = $this->media($this->element->getValue());
+    if (!empty($media)) {
+        $media = $media->toArray();
+    } else {
+        $media = [];
+    }
+}
+
+$this->admin()->addJsonTemplate($jsonDataId, $media);
+?>
+<div ng-controller="FileSelectorController"
+     json-data-id="<?= $jsonDataId ?>"
+     modal-template="<?= $modalTemplate ?>"
+     class="form-group<?= ($this->hasErrors) ? ' has-error has-feedback' : ''?>">
+    <label for="<?= $this->element->getName() ?>" class="col-sm-2 control-label">
+        <?= $this->translate($this->element->getLabel(), 'admin') ?>
+        <?php if($this->element->hasAttribute('required')): ?>
+            <abbr title="required">*</abbr>
+        <?php endif; ?>
+    </label>
+    <div ng-if="isImage()" class="col-sm-2">
+        <img class="img-responsive" ng-src="{{getSrc(media, 'admin_thumbnail')}}">
+    </div>
+    <div ng-class="{'col-sm-8': isImage(), 'col-sm-10': !isImage()}">
+        <div>
+            <input type="hidden" name="<?= $this->element->getName() ?>" value="{{ media.id }}">
+            <div class="input-group">
+                <input type="text" class="form-control" value="{{ media.title }}" readonly>
+                <span class="input-group-btn">
+                    <a type="button" class="btn btn-default" ng-click="selectMedia()">
+                        <i class="fa fa-check"></i>
+                        <?= $this->translate('button.select', 'admin') ?>
+                    </a>
+                    <a type="button" class="btn btn-default" ng-click="clearMedia()">
+                        <i class="fa fa-trash-o"></i>
+                        <?= $this->translate('button.clear', 'admin') ?>
+                    </a>
+                    <a ng-href="{{getSrc(media)}}" class="btn btn-default" target="_blank">
+                        <i class="fa fa-download"></i>
+                        <?= $this->translate('button.download', 'admin') ?>
+                    </a>
+                </span>
+            </div>
+        </div>
+        <?php if ($this->hasErrors): ?>
+            <span class="glyphicon glyphicon-warning-sign form-control-feedback"></span>
+            <ul class="list-unstyled text-danger">
+                <?php foreach($this->element->getMessages() as $message): ?>
+                    <li><?= $message ?></li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+    </div>
+</div>
+
+<?php
+
+$category = $this->element->getOption("category") ;
+if (empty($category)) $category = "default";
+
+$modalContent = <<<EOT
+<div class="modal-header">
+    <h3 class="modal-title">{$this->translate('title.media', 'admin')}</h3>
+</div>
+<div class="modal-body modal-scroll-body">
+    <div class="container-fluid">
+        <ng-include src="'{$this->url('admin/media', ['referrer' => 'modal', 'category' => $category])}'"></ng-include>
+    </div>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="ok()">
+        <span class="fa fa-check"></span>
+        {$this->translate('button.select', 'admin')}
+    </button>
+    <button class="btn btn-default" ng-click="cancel()">{$this->translate('button.cancel', 'admin')}</button>
+</div>
+EOT;
+$this->admin()->addHtmlTemplate($modalTemplate, $modalContent);
+?>

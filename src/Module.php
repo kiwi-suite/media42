@@ -78,6 +78,9 @@ class Module implements
                     "baseUrl" => $mediaOptions->getUrl(),
                     "dimensions" => $mediaOptions->getDimensions(),
                 ]);
+
+                $formElement = $viewHelperManager->get('formElement');
+                $formElement->addClass('Media42\FormElements\FileSelect', 'formfileselect');
             },
             999999
         );
