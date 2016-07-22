@@ -9,18 +9,22 @@
 
 namespace Media42;
 
-use Admin42\Mvc\Controller\AbstractAdminController;
+use Admin42\ModuleManager\Feature\AdminAwareModuleInterface;
 use Core42\Mvc\Environment\Environment;
+use Media42\FormElements\FileSelect;
 use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
 use Zend\ModuleManager\Feature\ConfigProviderInterface;
 use Zend\ModuleManager\Feature\DependencyIndicatorInterface;
 use Zend\Mvc\MvcEvent;
+use Zend\ServiceManager\Factory\InvokableFactory;
+use Media42\View\Helper\Form\FileSelect as ViewFileSelect;
 
 class Module implements
     ConfigProviderInterface,
     BootstrapListenerInterface,
-    DependencyIndicatorInterface
+    DependencyIndicatorInterface,
+    AdminAwareModuleInterface
 {
     /**
      * @return array
@@ -61,15 +65,6 @@ class Module implements
 
                 $viewHelperManager = $serviceManager->get('ViewHelperManager');
 
-                $headScript = $viewHelperManager->get('headScript');
-                $headLink = $viewHelperManager->get('headLink');
-                $basePath = $viewHelperManager->get('basePath');
-
-                $headScript->appendFile($basePath('/assets/media42/core/js/vendor.min.js'));
-                $headScript->appendFile($basePath('/assets/media42/core/js/media42.min.js'));
-
-                $headLink->appendStylesheet($basePath('/assets/media42/core/css/media42.min.css'));
-
                 $admin = $viewHelperManager->get('admin');
 
                 $mediaOptions = $serviceManager->get(MediaOptions::class);
@@ -78,11 +73,8 @@ class Module implements
                     "baseUrl" => $mediaOptions->getUrl(),
                     "dimensions" => $mediaOptions->getDimensions(),
                 ]);
-
-                $formElement = $viewHelperManager->get('formElement');
-                $formElement->addClass('Media42\FormElements\FileSelect', 'formfileselect');
             },
-            999999
+            100
         );
     }
 
@@ -96,6 +88,57 @@ class Module implements
         return [
             'Core42',
             'Admin42'
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getAdminStylesheets()
+    {
+        return [
+            '/assets/media42/core/css/media42.min.css',
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getAdminJavascript()
+    {
+        return [
+            '/assets/media42/core/js/vendor.min.js',
+            '/assets/media42/core/js/media42.min.js'
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getAdminViewHelpers()
+    {
+        return [
+            'factories' => [
+                ViewFileSelect::class => InvokableFactory::class
+            ],
+            'aliases' => [
+                'formfileselect' => ViewFileSelect::class,
+            ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getAdminFormElements()
+    {
+        return [
+            'factories' => [
+                FileSelect::class => InvokableFactory::class
+            ],
+            'aliases' => [
+                'fileSelect' => FileSelect::class,
+            ],
         ];
     }
 }

@@ -1,7 +1,7 @@
 {
     "name": "fruit42/media42",
     "require": {
-	"php": "^5.6 || ^7.0",
+        "php": "^5.6 || ^7.0",
         "ext-fileinfo": "*",
         "imagine/imagine": "0.6.3"
     },

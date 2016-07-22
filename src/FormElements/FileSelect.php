@@ -13,5 +13,10 @@ use Zend\Form\Element;
 
 class FileSelect extends Element
 {
-
+    /**
+     * @var array
+     */
+    protected $attributes = [
+        'type' => 'fileselect',
+    ];
 }
