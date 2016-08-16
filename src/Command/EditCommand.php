@@ -162,7 +162,7 @@ class EditCommand extends AbstractCommand
 
         if (!empty($this->keywords)) {
             /* @var SaveCommand $cmd */
-            $cmd = $this->getCommand('Admin42\Tag\Save');
+            $cmd = $this->getCommand(SaveCommand::class);
             $cmd->setTags($this->keywords)
                 ->run();
         }
@@ -174,7 +174,7 @@ class EditCommand extends AbstractCommand
         if (!empty($this->uploadData)) {
             /* @var UploadCommand $cmd */
             /*
-            $cmd = $this->getCommand('Admin42\Media\Upload');
+            $cmd = $this->getCommand(UploadCommand::class);
             $cmd->setMedia($this->media)
                 ->setUploadData('')
                 ->run();

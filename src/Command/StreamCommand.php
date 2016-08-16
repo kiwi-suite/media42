@@ -11,6 +11,7 @@ namespace Media42\Command;
 
 use Media42\Model\Media;
 use Core42\Command\AbstractCommand;
+use Media42\TableGateway\MediaTableGateway;
 use Zend\Http\Headers;
 use Zend\Http\Response\Stream;
 
@@ -67,7 +68,7 @@ class StreamCommand extends AbstractCommand
     protected function preExecute()
     {
         if ($this->mediaId > 0) {
-            $this->media = $this->getTableGateway('Admin42\Media')->selectByPrimary((int) $this->mediaId);
+            $this->media = $this->getTableGateway(MediaTableGateway::class)->selectByPrimary((int) $this->mediaId);
         }
 
         if (empty($this->media)) {

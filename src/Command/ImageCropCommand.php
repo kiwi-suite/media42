@@ -157,7 +157,7 @@ class ImageCropCommand extends AbstractCommand
     protected function preExecute()
     {
         if ($this->mediaId > 0) {
-            $this->media = $this->getTableGateway('Admin42\Media')->selectByPrimary((int) $this->mediaId);
+            $this->media = $this->getTableGateway(MediaTableGateway::class)->selectByPrimary((int) $this->mediaId);
         }
 
         if (empty($this->media)) {
