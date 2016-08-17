@@ -11,6 +11,7 @@ namespace Media42\View\Helper;
 
 use Media42\Model\Media as MediaModel;
 use Media42\TableGateway\MediaTableGateway;
+use Psr\Cache\CacheItemPoolInterface;
 use Zend\Cache\Storage\StorageInterface;
 use Zend\View\Helper\AbstractHelper;
 
@@ -22,15 +23,15 @@ class Media extends AbstractHelper
     protected $mediaTableGateway;
 
     /**
-     * @var StorageInterface
+     * @var CacheItemPoolInterface
      */
     protected $cache;
 
     /**
      * @param MediaTableGateway $mediaTableGateway
-     * @param StorageInterface $cache
+     * @param CacheItemPoolInterface $cache
      */
-    public function __construct(MediaTableGateway $mediaTableGateway, StorageInterface $cache)
+    public function __construct(MediaTableGateway $mediaTableGateway, CacheItemPoolInterface $cache)
     {
         $this->mediaTableGateway = $mediaTableGateway;
         $this->cache = $cache;
@@ -59,13 +60,16 @@ class Media extends AbstractHelper
         if (empty($mediaId)) {
             return null;
         }
-        if (!$this->cache->hasItem('media_'. $mediaId)) {
-            $this->cache->setItem(
-                'media_'. $mediaId,
-                $this->mediaTableGateway->selectByPrimary((int) $mediaId)
-            );
+        $item = $this->cache->getItem($mediaId);
+
+        $media = $item->get();
+
+        if (!$item->isHit()) {
+            $media = $this->mediaTableGateway->selectByPrimary((int) $mediaId);
+            $item->set($media);
+            $this->cache->save($item);
         }
 
-        return $this->cache->getItem('media_'. $mediaId);
+        return $media;
     }
 }

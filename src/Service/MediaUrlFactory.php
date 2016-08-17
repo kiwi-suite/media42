@@ -37,7 +37,7 @@ class MediaUrlFactory implements FactoryInterface
         return new MediaUrl(
             $container->get('TableGateway')->get(MediaTableGateway::class),
             $container->get(MediaOptions::class),
-            $container->get('Cache\Media')
+            $container->get('Cache')->get('media')
         );
     }
 }

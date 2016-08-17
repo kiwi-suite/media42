@@ -11,7 +11,7 @@ namespace Media42;
 
 use Media42\Model\Media;
 use Media42\TableGateway\MediaTableGateway;
-use Zend\Cache\Storage\StorageInterface;
+use Psr\Cache\CacheItemPoolInterface;
 
 class MediaUrl
 {
@@ -26,19 +26,19 @@ class MediaUrl
     protected $mediaOptions;
 
     /**
-     * @var StorageInterface
+     * @var CacheItemPoolInterface
      */
     protected $cache;
 
     /**
      * @param MediaTableGateway $mediaTableGateway
      * @param MediaOptions $mediaOptions
-     * @param StorageInterface $cache
+     * @param CacheItemPoolInterface $cache
      */
     public function __construct(
         MediaTableGateway $mediaTableGateway,
         MediaOptions $mediaOptions,
-        StorageInterface $cache
+        CacheItemPoolInterface $cache
     ) {
         $this->mediaTableGateway = $mediaTableGateway;
         $this->mediaOptions = $mediaOptions;
@@ -90,13 +90,16 @@ class MediaUrl
         if (empty($mediaId)) {
             return null;
         }
-        if (!$this->cache->hasItem('media_'. $mediaId)) {
-            $this->cache->setItem(
-                'media_'. $mediaId,
-                $this->mediaTableGateway->selectByPrimary((int) $mediaId)
-            );
+        $item = $this->cache->getItem($mediaId);
+
+        $media = $item->get();
+
+        if (!$item->isHit()) {
+            $media = $this->mediaTableGateway->selectByPrimary((int) $mediaId);
+            $item->set($media);
+            $this->cache->save($item);
         }
 
-        return $this->cache->getItem('media_'. $mediaId);
+        return $media;
     }
 }

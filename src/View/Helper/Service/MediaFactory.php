@@ -35,7 +35,7 @@ class MediaFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $mediaTableGateway = $container->get('TableGateway')->get(MediaTableGateway::class);
-        $cache = $container->get('Cache\Media');
+        $cache = $container->get('Cache')->get('media');
 
         return new Media($mediaTableGateway, $cache);
     }
