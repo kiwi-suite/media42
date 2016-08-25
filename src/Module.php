@@ -97,7 +97,7 @@ class Module implements
     public function getAdminStylesheets()
     {
         return [
-            '/assets/media42/core/css/media42.min.css',
+            '/assets/admin/media42/css/media42.min.css',
         ];
     }
 
@@ -107,8 +107,8 @@ class Module implements
     public function getAdminJavascript()
     {
         return [
-            '/assets/media42/core/js/vendor.min.js',
-            '/assets/media42/core/js/media42.min.js'
+            '/assets/admin/media42/js/vendor.min.js',
+            '/assets/admin/media42/js/media42.min.js'
         ];
     }
 

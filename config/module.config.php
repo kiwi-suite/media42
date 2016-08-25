@@ -57,7 +57,7 @@ return [
 
     'assets' => [
         __NAMESPACE__ => [
-            'target' => 'public/assets/media42/core',
+            'target' => 'public/assets/admin/media42',
             'source' => 'vendor/fruit42/media42/assets/dist/',
         ],
     ],
