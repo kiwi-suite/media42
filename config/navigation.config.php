@@ -8,13 +8,10 @@ return [
                 'content' => [
                     'pages' => [
                         'media' => [
-                            'options' => [
-                                'label' => 'label.media',
-                                'route' => 'admin/media',
-                                'icon' => 'fa fa-picture-o fa-fw',
-                                'order' => 5000,
-                                'permission' => 'route/admin/media'
-                            ],
+                            'label' => 'label.media',
+                            'route' => 'admin/media',
+                            'icon' => 'fa fa-picture-o fa-fw',
+                            'order' => 5000,
                         ],
                     ]
                 ],
