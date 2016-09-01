@@ -145,7 +145,7 @@
                                     </div>
 
                                     <img ng-if="isImage(row)" ng-src="{{ getSrc(row, 'admin_thumbnail') }}" class="img-full r r-2x">
-                                    <img ng-if="!isImage(row)" src="<?= $this->basePath('assets/admin/admin42/images/document-placeholder.jpg') ?>" class="img-full r r-2x">
+                                    <img ng-if="!isImage(row)" src="<?= $this->assetUrl('assets/admin/admin42/images/document-placeholder.jpg') ?>" class="img-full r r-2x">
 
                                 </div>
                             </div>
