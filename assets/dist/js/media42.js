@@ -3,6 +3,81 @@ angular.module('media42', [
 ]);
 ;
 angular.module('media42')
+    .directive('formMedia', [function() {
+        return {
+            restrict: 'E',
+            templateUrl: function(elem, attrs) {
+                return attrs.template;
+            },
+            scope: {
+                elementDataId: '@'
+            },
+            controller: ['$scope', 'jsonCache', '$formService', '$uibModal', function($scope, jsonCache, $formService, $uibModal) {
+                $scope.formData = jsonCache.get($scope.elementDataId);
+
+                $scope.onChange = function () {
+                    $scope.formData.errors = [];
+                };
+
+                $scope.empty = function() {
+                    $scope.formData.value = "";
+                    $scope.onChange();
+                };
+
+                $scope.selectMedia = function() {
+                    var modalInstance = $uibModal.open({
+                        animation: true,
+                        templateUrl: 'element/form/media-modal.html',
+                        controller: ['$scope', '$uibModalInstance', 'formData', function ($scope, $uibModalInstance, formData) {
+                            $scope.selectedMedia = null;
+                            $scope.mediaUrl = formData.mediaUrl;
+
+                            $scope.selectMedia = function(media) {
+                                if ($scope.selectedMedia !== null && $scope.selectedMedia.id == media.id) {
+                                    $scope.selectedMedia = null;
+
+                                    return;
+                                }
+                                $scope.selectedMedia = media;
+                            };
+
+                            $scope.ok = function () {
+                                $uibModalInstance.close($scope.selectedMedia);
+                            };
+
+                            $scope.cancel = function () {
+                                $uibModalInstance.dismiss('cancel');
+                            };
+                        }],
+                        size: 'lg',
+                        resolve: {
+                            formData: function() {
+                                return $scope.formData;
+                            }
+                        }
+                    });
+
+                    modalInstance.result.then(function(media) {
+                        if (media !== null) {
+                            $scope.media = media;
+                        }
+                    }, function () {
+
+                    });
+                };
+
+                if (angular.isDefined($scope.formData.options.formServiceHash)) {
+                    $formService.put(
+                        $scope.formData.options.formServiceHash,
+                        $scope.formData.name,
+                        $scope.elementDataId
+                    );
+                }
+            }]
+        }
+    }]);
+;
+angular.module('media42')
     .controller('CropController', ['$scope', '$http', '$timeout', 'Cropper', 'jsonCache', '$attrs', '$interval', function ($scope, $http, $timeout, Cropper, jsonCache, $attrs, $interval) {
         $scope.data = [];
 
@@ -323,7 +398,7 @@ angular.module('media42')
     }]);
 ;
 angular.module('media42')
-    .controller('MediaController', ['$scope', 'FileUploader', '$attrs', '$http', '$sessionStorage', '$templateCache', 'toaster', 'MediaService', function ($scope, FileUploader, $attrs, $http, $sessionStorage, $templateCache, toaster, MediaService) {
+    .controller('MediaController', ['$scope', 'FileUploader', '$attrs', '$http', '$sessionStorage', '$templateCache', 'MediaService', '$uibModal', function ($scope, FileUploader, $attrs, $http, $sessionStorage, $templateCache, MediaService, $uibModal) {
         $templateCache.put('template/smart-table/pagination.html',
             '<nav ng-if="numPages && pages.length >= 2"><ul class="pagination">' +
             '<li ng-if="currentPage > 1"><a ng-click="selectPage(1)"><i class="fa fa-angle-double-left"></i></a></li>' +
@@ -366,6 +441,44 @@ angular.module('media42')
                 }
             }]
         });
+
+        $scope.delete = function(deleteUrl, id, modalTitle, modalContent) {
+            $scope.deleteLoading = true;
+            var modalInstance = $uibModal.open({
+                animation: true,
+                templateUrl: 'element/delete-modal.html',
+                controller: 'DeleteModalController',
+                resolve: {
+                    requestUrl: function(){
+                        return deleteUrl;
+                    },
+                    requestParams: function(){
+                        return {id: id};
+                    },
+                    requestTitle: function(){
+                        return modalTitle;
+                    },
+                    requestContent: function(){
+                        return modalContent;
+                    },
+                    requestMethod: function(){
+                        return "delete";
+                    },
+                    requestIcon: function(){
+                        return "fa fa-trash-o";
+                    }
+                }
+            });
+
+            modalInstance.result.then(function (data) {
+                requestFromServer(url, currentTableState);
+
+
+                $scope.deleteLoading = false;
+            }, function () {
+                $scope.deleteLoading = false;
+            });
+        }
 
         $scope.uploadCategoryChange = function() {
             $('#categorySearchSelect').val($scope.category);
@@ -430,6 +543,34 @@ angular.module('media42')
             error(function(data, status, headers, config) {
             });
         }
+    }]);
+;
+angular.module('media42')
+    .controller('ReplaceUploaderController', ['$scope', 'FileUploader', '$attrs', '$window', function ($scope, FileUploader, $attrs, $window) {
+        $scope.errorFiles = [];
+
+        $scope.uploader = new FileUploader({
+            url: $attrs.uploadUrl,
+            autoUpload: true,
+            queueLimit: 1,
+            removeAfterUpload: true,
+            filters: [{
+                name: 'filesize',
+                fn: function(item) {
+                    if (item.size > $attrs.maxFileSize) {
+                        $scope.errorFiles.push(item);
+
+                        return false;
+                    }
+
+                    return true;
+                }
+            }]
+        });
+
+        $scope.uploader.onSuccessItem = function() {
+            $window.location.reload();
+        };
     }]);
 ;
 angular.module('media42')

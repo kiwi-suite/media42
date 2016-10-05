@@ -30,18 +30,6 @@ return [
         ],
     ],
 
-    'admin' => [
-        'angular' => [
-            'modules' => ['media42']
-        ],
-    ],
-
-    'link' => [
-        'adapter' => [
-            'media'  => MediaLink::class,
-        ],
-    ],
-
     'view_manager' => [
         'template_path_stack' => [
             __NAMESPACE__ => __DIR__ . '/../view',

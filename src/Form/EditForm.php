@@ -9,10 +9,7 @@
 
 namespace Media42\Form;
 
-use Admin42\FormElements\Tags;
-use Zend\Form\Element\Text;
-use Zend\Form\Element\Textarea;
-use Zend\Form\Form;
+use Admin42\FormElements\Form;
 
 class EditForm extends Form
 {
@@ -21,22 +18,15 @@ class EditForm extends Form
      */
     public function init()
     {
-        $title = new Text("title");
-        $title->setLabel("label.title");
-        $this->add($title);
+        $this->add([
+            'name' => 'csrf',
+            'type' => 'csrf',
+        ]);
 
-        $description = new Textarea('description');
-        $description->setLabel('label.description');
-        $this->add($description);
-
-        $tags = new Tags('keywords');
-        $tags->setLabel('label.keywords');
-        $this->add($tags);
-
-        /*
-        $tags = new File('file');
-        $tags->setLabel('label.tags');
-        $this->add($tags);
-*/
+        $this->add([
+            'name' => 'filename',
+            'label' => 'label.filename',
+            'type' => 'text',
+        ]);
     }
 }

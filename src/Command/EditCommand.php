@@ -9,18 +9,14 @@
 
 namespace Media42\Command;
 
-use Media42\MediaEvent;
+use Cocur\Slugify\Slugify;
+use Dflydev\ApacheMimeTypes\PhpRepository;
+use Media42\Event\MediaEvent;
+use Media42\MediaOptions;
 use Media42\Model\Media;
 use Core42\Command\AbstractCommand;
-use Core42\Command\ConsoleAwareTrait;
-use Core42\Db\ResultSet\ResultSet;
-use Imagine\Image\Box;
-use Imagine\Image\ImagineInterface;
-use Imagine\Image\Point;
-use Admin42\Command\Tag\SaveCommand;
 use Media42\TableGateway\MediaTableGateway;
-use Zend\Json\Json;
-use ZF\Console\Route;
+use Zend\Stdlib\Glob;
 
 class EditCommand extends AbstractCommand
 {
@@ -38,17 +34,12 @@ class EditCommand extends AbstractCommand
     /**
      * @var string
      */
-    protected $title;
+    protected $filename;
 
     /**
      * @var string
      */
-    protected $description;
-
-    /**
-     * @var string
-     */
-    protected $keywords;
+    protected $oldFilename;
 
     /**
      * @var array
@@ -76,42 +67,12 @@ class EditCommand extends AbstractCommand
     }
 
     /**
-     * @param string $title
+     * @param string $filename
      * @return $this
      */
-    public function setTitle($title)
+    public function setFilename($filename)
     {
-        $this->title = $title;
-        return $this;
-    }
-
-    /**
-     * @param string $description
-     * @return $this
-     */
-    public function setDescription($description)
-    {
-        $this->description = $description;
-        return $this;
-    }
-
-    /**
-     * @param string $keywords
-     * @return $this
-     */
-    public function setKeywords($keywords)
-    {
-        $this->keywords = $keywords;
-        return $this;
-    }
-
-    /**
-     * @param array $uploadData
-     * @return $this
-     */
-    public function setUploadData($uploadData)
-    {
-        $this->uploadData = $uploadData;
+        $this->filename = $filename;
         return $this;
     }
 
@@ -120,9 +81,7 @@ class EditCommand extends AbstractCommand
      */
     public function hydrate(array $values)
     {
-        $this->setTitle($values['title']);
-        $this->setDescription($values['description']);
-        $this->setKeywords($values['keywords']);
+        $this->setFilename($values['filename']);
     }
 
     /**
@@ -138,9 +97,11 @@ class EditCommand extends AbstractCommand
             $this->addError("media", "invalid media");
         }
 
-        if (empty($this->title)) {
-            $this->addError("title", "title can't be empty");
+        if (empty($this->filename)) {
+            $this->addError("title", "filename can't be empty");
         }
+
+        $this->oldFilename = $this->media->getFilename();
     }
 
     /**
@@ -148,41 +109,68 @@ class EditCommand extends AbstractCommand
      */
     protected function execute()
     {
-        $this->media->setTitle($this->title)
-            ->setDescription((!empty($this->description) ? $this->description : null))
-            ->setKeywords($this->keywords)
-            ->setUpdated(new \DateTime());
+        $this->media->setFilename($this->filename);
 
-        $this
-            ->getServiceManager()
-            ->get('Media42\EventManager')
-            ->trigger(MediaEvent::EVENT_EDIT_PRE, $this->media);
+        if ($this->media->hasChanged()) {
+            $this->media->setUpdated(new \DateTime());
 
-        $this->getTableGateway(MediaTableGateway::class)->update($this->media);
+            if ($this->media->hasChanged('filename')) {
+                $this->renameFiles();
+            }
 
-        if (!empty($this->keywords)) {
-            /* @var SaveCommand $cmd */
-            $cmd = $this->getCommand(SaveCommand::class);
-            $cmd->setTags($this->keywords)
-                ->run();
-        }
-        $this
-            ->getServiceManager()
-            ->get('Media42\EventManager')
-            ->trigger(MediaEvent::EVENT_EDIT_POST, $this->media);
+            $this->getTableGateway(MediaTableGateway::class)->update($this->media);
 
-        if (!empty($this->uploadData)) {
-            /* @var UploadCommand $cmd */
-            /*
-            $cmd = $this->getCommand(UploadCommand::class);
-            $cmd->setMedia($this->media)
-                ->setUploadData('')
-                ->run();
-            */
+            $this
+                ->getServiceManager()
+                ->get('Media42\EventManager')
+                ->trigger(MediaEvent::EVENT_EDIT, $this->media);
+
+            $this->getCache('media')->deleteItem($this->media->getId());
         }
 
-        $this->getCache('media')->deleteItem($this->media->getId());
+
 
         return $this->media;
+    }
+
+    protected function renameFiles()
+    {
+        $filenameParts = pathinfo($this->media->getFilename());
+
+        $filename = $this
+            ->getServiceManager()
+            ->get(Slugify::class)
+            ->slugify($filenameParts['filename']);
+
+        $extension = $filenameParts['extension'];
+        $mimeTypeRepository = new PhpRepository();
+
+        $availableExtensions = $mimeTypeRepository->findExtensions($this->media->getMimeType());
+        if (count($availableExtensions) > 0) {
+            $extension = current($availableExtensions);
+        }
+
+        $this->media->setFilename($filename . '.' . $extension);
+
+        $oldFilenameParts = pathinfo($this->oldFilename);
+        $filenameParts = pathinfo($this->media->getFilename());
+
+        $mediaOptions = $this->getServiceManager()->get(MediaOptions::class);
+        $globPath = $mediaOptions->getPath() . $this->media->getDirectory() . $oldFilenameParts['filename'] . '*';
+        var_dump($globPath);
+        $entries = Glob::glob($globPath);
+        foreach ($entries as $file) {
+            $currentFilenameParts = pathinfo($file);
+
+            $newFilename = str_replace(
+                $oldFilenameParts['filename'],
+                $filenameParts['filename'],
+                $currentFilenameParts['filename']
+            );
+            $newFilename = $currentFilenameParts['dirname'] . '/' . $newFilename;
+            $newFilename .= '.' .$currentFilenameParts['extension'];
+
+            rename($file, $newFilename);
+        }
     }
 }

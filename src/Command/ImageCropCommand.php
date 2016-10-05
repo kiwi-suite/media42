@@ -13,7 +13,7 @@ use Core42\Command\AbstractCommand;
 use Imagine\Image\Box;
 use Imagine\Image\ImagineInterface;
 use Imagine\Image\Point;
-use Media42\MediaEvent;
+use Media42\Event\MediaEvent;
 use Media42\MediaOptions;
 use Media42\Model\Media;
 use Media42\TableGateway\MediaTableGateway;

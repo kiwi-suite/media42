@@ -97,22 +97,31 @@ class MediaController extends AbstractAdminController
         /** @var MediaOptions $mediaOptions */
         $mediaOptions = $this->getServiceManager()->get(MediaOptions::class);
 
+        $dimensions = $mediaOptions->getDimensions(false);
+
         $imageSize = null;
-        if (substr($media->getMimeType(), 0, 6) == "image/") {
-            $imagine = $this->getServiceManager()->get('Imagine');
-            $box = $imagine->open($mediaOptions->getPath() . $media->getDirectory() . $media->getFilename())->getSize();
-            $imageSize = [
-                'width' => $box->getWidth(),
-                'height' => $box->getHeight(),
-            ];
+        $imageEditing = false;
+        if (count($dimensions) > 0 && substr($media->getMimeType(), 0, 6) == "image/") {
+            $filename = $mediaOptions->getPath() . $media->getDirectory() . $media->getFilename();
+            if (file_exists($filename)) {
+                $imageEditing = true;
+                $imagine = $this->getServiceManager()->get('Imagine');
+                $box = $imagine->open($mediaOptions->getPath() . $media->getDirectory() . $media->getFilename())->getSize();
+                $imageSize = [
+                    'width' => $box->getWidth(),
+                    'height' => $box->getHeight(),
+                ];
+            }
+
         }
 
         return [
             'editForm' => $editForm,
             'media' => $media,
-            'dimensions' => $mediaOptions->getDimensions(false),
+            'dimensions' => $dimensions,
             'imageSize' => $imageSize,
-            'maxFileSize' => MaxUploadFileSize::getSize()
+            'maxFileSize' => MaxUploadFileSize::getSize(),
+            'imageEditing' => $imageEditing,
         ];
     }
 
@@ -141,17 +150,6 @@ class MediaController extends AbstractAdminController
     }
 
     /**
-     * @return \Zend\Http\Response\Stream
-     */
-    public function streamAction()
-    {
-        return $this->getCommand(StreamCommand::class)
-            ->setMediaId($this->params("id"))
-            ->setDimension($this->params("dimension"))
-            ->run();
-    }
-
-    /**
      * @return JsonModel
      * @throws \Exception
      */
@@ -168,8 +166,12 @@ class MediaController extends AbstractAdminController
 
             $form->setData($post);
             if ($form->isValid()) {
+                $cmd = $this->getCommand(UploadCommand::class);
+                if ($this->params()->fromRoute('id') > 0) {
+                    $cmd->setMediaId($this->params()->fromRoute('id'));
+                }
                 $this->getFormCommand()
-                    ->setCommand($this->getCommand(UploadCommand::class))
+                    ->setCommand($cmd)
                     ->setForm($form)
                     ->enableAutomaticFormFill(false)
                     ->run();

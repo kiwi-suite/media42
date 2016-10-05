@@ -10,7 +10,10 @@
 namespace Media42;
 
 use Admin42\ModuleManager\Feature\AdminAwareModuleInterface;
+use Admin42\ModuleManager\GetAdminConfigTrait;
+use Core42\ModuleManager\GetConfigTrait;
 use Core42\Mvc\Environment\Environment;
+use Media42\Event\MediaEventListener;
 use Media42\FormElements\FileSelect;
 use Zend\EventManager\EventInterface;
 use Zend\ModuleManager\Feature\BootstrapListenerInterface;
@@ -26,20 +29,9 @@ class Module implements
     DependencyIndicatorInterface,
     AdminAwareModuleInterface
 {
-    /**
-     * @return array
-     */
-    public function getConfig()
-    {
-        return array_merge(
-            include __DIR__ . '/../config/module.config.php',
-            include __DIR__ . '/../config/cli.config.php',
-            include __DIR__ . '/../config/caches.config.php',
-            include __DIR__ . '/../config/navigation.config.php',
-            include __DIR__ . '/../config/services.config.php',
-            include __DIR__ . '/../config/routing.config.php'
-        );
-    }
+
+    use GetConfigTrait;
+    use GetAdminConfigTrait;
 
     /**
      * Listen to the bootstrap event
@@ -65,17 +57,25 @@ class Module implements
 
                 $viewHelperManager = $serviceManager->get('ViewHelperManager');
 
-                $admin = $viewHelperManager->get('admin');
+                $angular = $viewHelperManager->get('angular');
 
                 $mediaOptions = $serviceManager->get(MediaOptions::class);
 
-                $admin->addJsonTemplate("mediaConfig", [
+                $angular->addJsonTemplate("mediaConfig", [
                     "baseUrl" => $mediaOptions->getUrl(),
                     "dimensions" => $mediaOptions->getDimensions(),
                 ]);
             },
             100
         );
+
+        $serviceManager = $e->getApplication()->getServiceManager();
+        if (!$serviceManager->get(Environment::class)->is(\Admin42\Module::ENVIRONMENT_ADMIN)) {
+            return;
+        }
+        $serviceManager
+            ->get(MediaEventListener::class)
+            ->attach($serviceManager->get('Media42\EventManager'));
     }
 
     /**
@@ -88,57 +88,6 @@ class Module implements
         return [
             'Core42',
             'Admin42'
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function getAdminStylesheets()
-    {
-        return [
-            '/assets/admin/media42/css/media42.min.css',
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function getAdminJavascript()
-    {
-        return [
-            '/assets/admin/media42/js/vendor.min.js',
-            '/assets/admin/media42/js/media42.min.js'
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function getAdminViewHelpers()
-    {
-        return [
-            'factories' => [
-                ViewFileSelect::class => InvokableFactory::class
-            ],
-            'aliases' => [
-                'formfileselect' => ViewFileSelect::class,
-            ],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function getAdminFormElements()
-    {
-        return [
-            'factories' => [
-                FileSelect::class => InvokableFactory::class
-            ],
-            'aliases' => [
-                'fileSelect' => FileSelect::class,
-            ],
         ];
     }
 }

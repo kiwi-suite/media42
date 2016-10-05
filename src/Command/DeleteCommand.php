@@ -9,8 +9,7 @@
 
 namespace Media42\Command;
 
-use Media42\MediaEvent;
-use Media42\MediaOptions;
+use Media42\Event\MediaEvent;
 use Media42\Model\Media;
 use Core42\Command\AbstractCommand;
 use Media42\TableGateway\MediaTableGateway;
@@ -66,31 +65,9 @@ class DeleteCommand extends AbstractCommand
      */
     protected function execute()
     {
-        /* @var MediaOptions $mediaOptions */
-        $mediaOptions = $this->getServiceManager()->get(MediaOptions::class);
-
-        $baseDir = $mediaOptions->getPath() . $this->media->getDirectory();
-
-        $filename = $this->media->getFilename();
-        $filename = substr($filename, 0, strrpos($filename, '.'));
-
-        $removedCount = 0;
-        $dir = scandir($baseDir);
-        foreach ($dir as $_entry) {
-            if ($_entry == ".." || $_entry == ".") {
-                $removedCount++;
-                continue;
-            }
-
-            if (strpos($_entry, $filename) === 0) {
-                @unlink($baseDir . $_entry);
-                $removedCount++;
-            }
-        }
-
-        if (count($dir) == ($removedCount)) {
-            @rmdir($baseDir);
-        }
+        $this->getCommand(CleanupDataDirectory::class)
+            ->setMedia($this->media)
+            ->run();
 
         $this->getTableGateway(MediaTableGateway::class)->delete($this->media);
 

@@ -20,18 +20,18 @@ class MediaTableGateway extends AbstractTableGateway
      * @var array
      */
     protected $databaseTypeMap = [
-        'id' => 'Integer',
-        'directory' => 'String',
-        'filename' => 'String',
-        'category' => 'String',
-        'title' => 'String',
-        'description' => 'String',
-        'keywords' => 'String',
-        'mimeType' => 'String',
-        'size' => 'Integer',
-        'meta' => 'String',
-        'updated' => 'DateTime',
-        'created' => 'DateTime',
+        'id' => 'integer',
+        'directory' => 'string',
+        'filename' => 'string',
+        'category' => 'string',
+        'title' => 'string',
+        'description' => 'string',
+        'keywords' => 'string',
+        'mimeType' => 'string',
+        'size' => 'integer',
+        'meta' => 'json',
+        'updated' => 'dateTime',
+        'created' => 'dateTime',
     ];
 
     /**

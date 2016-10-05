@@ -6,7 +6,16 @@
     </h1>
 </div>
 <?php endif; ?>
-<div class="<?= ($this->params()->fromRoute('referrer') == "index") ? "wrapper-md" : ""?>" ng-controller="MediaController" data-upload-url="<?= $this->uploadHost . $this->url('admin/media/upload') ?>" data-url="<?= $this->url('admin/media')?>" data-max-file-size="<?= $this->maxFileSize ?>" data-category="<?= $this->params("category", "default")?>" persist="admin42_media">
+<?php
+$persistKey = md5($this->params('referrer'). $this->params('category') . $this->params('mimeType'))
+?>
+<div class="<?= ($this->params()->fromRoute('referrer') == "index") ? "wrapper-md" : ""?>"
+     ng-controller="MediaController"
+     data-upload-url="<?= $this->uploadHost . $this->url('admin/media/upload') ?>"
+     data-url="<?= $this->url('admin/media')?>"
+     data-max-file-size="<?= $this->maxFileSize ?>"
+     data-category="<?= $this->params("category", "default")?>"
+     persist="admin42_media_<?= $persistKey ?>">
 
     <div class="panel panel-default">
         <div class="panel-heading" ng-click="isCollapsed = !isCollapsed">
@@ -14,7 +23,7 @@
             <h5 ng-if="isCollapsed"><?= $this->translate('start.upload', 'admin') ?></h5>
         </div>
 
-        <div class="panel-body" collapse="isCollapsed">
+        <div class="panel-body" uib-collapse="isCollapsed">
 
             <div class="alert alert-danger" ng-show="errorFiles.length != 0">
                 <strong><?= $this->translate('media.error.filesize', 'admin') ?> {{ '<?= $this->maxFileSize ?>' | bytes }}</strong>
@@ -78,7 +87,7 @@
                 </div>
             </div>
         </div>
-        <div class="panel-footer text-right" collapse="isCollapsed">
+        <div class="panel-footer text-right" uib-collapse="isCollapsed">
             <button type="button" class="btn btn-addon btn-primary" ng-click="uploader.uploadAll()" ng-hide="!uploader.getNotUploadedItems().length">
                 <i class="fa fa-arrow-circle-o-up"></i> <?= $this->translate('button.upload_all', 'admin')?>
             </button>
@@ -91,21 +100,37 @@
         </div>
     </div>
     <div class="table-responsive">
-        <table st-table="collection"  st-pipe="callServer" class="table table-striped top-border-radius">
+        <table st-table="collection" st-pipe="callServer" class="table table-striped top-border-radius">
             <thead>
             <tr>
-                <th>
-                    <input st-search="id" placeholder="<?= $this->translate('search.id', 'admin') ?>" class="form-control input-sm" type="text"/>
-                </th>
                 <th>
                     <input st-search="filename" placeholder="<?= $this->translate('search.name', 'admin') ?>" class="form-control input-sm" type="text"/>
                 </th>
                 <th>
-                    <select id="categorySearchSelect" st-input-event="change" st-search42="category" class="form-control" ng-model="category">
+                    <select id="categorySearchSelect" st-input-event="change" st-search42="category" class="form-control input-sm" ng-model="category">
                         <?php foreach($this->mediaCategories as $key => $value): ?>
                             <option value="<?= $key ?>" <?= ($key == $this->params("category") ? "selected" : "")?>><?= $this->translate($value, 'admin')?></option>
                         <?php endforeach; ?>
                     </select>
+                </th>
+                <th>
+                    <?php
+                    $mimeTypeFilter = [
+                        'all'  => $this->translate('label.mimeType.all', 'admin'),
+                        'images'  => $this->translate('label.mimeType.images', 'admin'),
+                        'pdf'  => $this->translate('label.mimeType.pdf', 'admin'),
+                    ]
+                    ?>
+
+                    <?php if ($this->params('mimeType') !== 'all'): ?>
+                        <input st-search="typeSearch" type="hidden" value="<?= $this->params('mimeType') ?>"/>
+                    <?php else: ?>
+                    <select st-input-event="change" st-search42="typeSearch" class="form-control input-sm">
+                        <?php foreach($mimeTypeFilter as $key => $value): ?>
+                            <option value="<?= $key ?>" <?= ($key == "all" ? "selected" : "")?>><?= $this->translate($value, 'admin')?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <?php endif; ?>
                 </th>
                 <th colspan="2">
                 </th>
@@ -122,17 +147,20 @@
                             <div class="item m-t-md" style="overflow: hidden;">
                                 <div class="pos-rlt bg-for-transparent">
                                     <div class="top w-full">
+                                        <?php if ($this->params()->fromRoute('referrer') != "index"): ?>
+                                            <a class="m-t-sm btn btn-rounded btn-icon btn-default" ng-class="{'btn-success': selectedMedia == row.id}" ng-click="selectMedia(row)">
+                                                <i class="fa fa-check"></i>
+                                            </a>
+                                        <?php endif; ?>
                                         <a ng-if="isImage(row)" class="m-l-sm m-t-sm btn btn-rounded btn-icon btn-default" ng-href="{{ getSrc(row) }}" lightbox>
                                             <i class="fa fa-search-plus"></i>
                                         </a>
                                         <a class="m-t-sm btn btn-rounded btn-icon btn-default" ng-href="<?= $this->url('admin/media/edit', ['id' => '{{row.id}}'])?>"<?= ($this->params()->fromRoute('referrer') != "index") ? ' target="_blank"': ''?>>
                                             <i class="fa fa-edit"></i>
                                         </a>
-                                        <?php if ($this->params()->fromRoute('referrer') != "index"): ?>
-                                            <a class="m-t-sm btn btn-rounded btn-icon btn-default" ng-class="{'btn-success': selectedMedia == row.id}" ng-click="selectMedia(row)">
-                                                <i class="fa fa-check"></i>
-                                            </a>
-                                        <?php endif; ?>
+                                        <a class="m-t-sm btn btn-rounded btn-icon btn-danger" ng-click="delete('<?= $this->url('admin/media/delete')?>', row.id, '<?= $this->translate("media.modal.delete.title", "admin") ?>', '<?= $this->translate("media.modal.delete.content", "admin") ?>')">
+                                            <i class="fa fa-trash-o"></i>
+                                        </a>
                                     </div>
                                     <div class="r-b r-2x bottom w-full bg-blacker-opacity text-white wrapper-xs">
                                         <span class="text-xs text-ellipsis">

@@ -12,7 +12,9 @@ namespace Media42\Selector\SmartTable;
 use Admin42\Selector\SmartTable\AbstractSmartTableSelector;
 use Core42\Db\ResultSet\ResultSet;
 use Media42\TableGateway\MediaTableGateway;
+use Zend\Db\Sql\Predicate\PredicateSet;
 use Zend\Db\Sql\Select;
+use Zend\Db\Sql\Where;
 
 class MediaSelector extends AbstractSmartTableSelector
 {
@@ -26,6 +28,32 @@ class MediaSelector extends AbstractSmartTableSelector
         $select = $gateway->getSql()->select();
 
         $where = $this->getWhere();
+
+        if (!empty($this->search['typeSearch']) && in_array($this->search['typeSearch'], ['images', 'pdf'])) {
+            $typeSearchWhere = new Where();
+            if ($this->search['typeSearch'] == 'images') {
+                $typeSearchWhere->in('mimeType', [
+                    'image/gif',
+                    'image/jpeg',
+                    'image/png',
+                    'image/tiff',
+                    'image/bmp',
+                    'image/bmp',
+                ]);
+            } elseif ($this->search['typeSearch'] == 'pdf') {
+                $typeSearchWhere->in('mimeType', [
+                    'application/pdf',
+                ]);
+            }
+
+            if (empty($where)) {
+                $where = $typeSearchWhere;
+            } else {
+                $predicateSet = new PredicateSet([$where, $typeSearchWhere], PredicateSet::COMBINED_BY_AND);
+                $where = $predicateSet;
+            }
+        }
+
         if (!empty($where)) {
             $select->where($where);
         }
@@ -46,9 +74,9 @@ class MediaSelector extends AbstractSmartTableSelector
     protected function getDatabaseTypeMap()
     {
         return [
-            'id'      => 'Integer',
-            'updated' => 'DateTime',
-            'created' => 'DateTime',
+            'id'      => 'integer',
+            'updated' => 'dateTime',
+            'created' => 'dateTime',
         ];
     }
 
@@ -57,7 +85,7 @@ class MediaSelector extends AbstractSmartTableSelector
      */
     protected function getSearchAbleColumns()
     {
-        return ['id', 'filename', 'category'];
+        return ['id', 'filename', 'category', 'mimeType'];
     }
 
     /**
@@ -65,7 +93,7 @@ class MediaSelector extends AbstractSmartTableSelector
      */
     protected function getSortAbleColumns()
     {
-        return ['id', 'filename', 'created'];
+        return [];
     }
 
     /**
@@ -73,6 +101,6 @@ class MediaSelector extends AbstractSmartTableSelector
      */
     protected function getDisplayColumns()
     {
-        return ['id', 'directory', 'filename', 'mimeType', 'size', 'meta', 'updated', 'created'];
+        return ['id', 'directory', 'filename', 'mimeType', 'size'];
     }
 }

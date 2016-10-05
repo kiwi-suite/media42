@@ -1,5 +1,5 @@
 angular.module('media42')
-    .controller('MediaController', ['$scope', 'FileUploader', '$attrs', '$http', '$sessionStorage', '$templateCache', 'toaster', 'MediaService', function ($scope, FileUploader, $attrs, $http, $sessionStorage, $templateCache, toaster, MediaService) {
+    .controller('MediaController', ['$scope', 'FileUploader', '$attrs', '$http', '$sessionStorage', '$templateCache', 'MediaService', '$uibModal', function ($scope, FileUploader, $attrs, $http, $sessionStorage, $templateCache, MediaService, $uibModal) {
         $templateCache.put('template/smart-table/pagination.html',
             '<nav ng-if="numPages && pages.length >= 2"><ul class="pagination">' +
             '<li ng-if="currentPage > 1"><a ng-click="selectPage(1)"><i class="fa fa-angle-double-left"></i></a></li>' +
@@ -42,6 +42,44 @@ angular.module('media42')
                 }
             }]
         });
+
+        $scope.delete = function(deleteUrl, id, modalTitle, modalContent) {
+            $scope.deleteLoading = true;
+            var modalInstance = $uibModal.open({
+                animation: true,
+                templateUrl: 'element/delete-modal.html',
+                controller: 'DeleteModalController',
+                resolve: {
+                    requestUrl: function(){
+                        return deleteUrl;
+                    },
+                    requestParams: function(){
+                        return {id: id};
+                    },
+                    requestTitle: function(){
+                        return modalTitle;
+                    },
+                    requestContent: function(){
+                        return modalContent;
+                    },
+                    requestMethod: function(){
+                        return "delete";
+                    },
+                    requestIcon: function(){
+                        return "fa fa-trash-o";
+                    }
+                }
+            });
+
+            modalInstance.result.then(function (data) {
+                requestFromServer(url, currentTableState);
+
+
+                $scope.deleteLoading = false;
+            }, function () {
+                $scope.deleteLoading = false;
+            });
+        }
 
         $scope.uploadCategoryChange = function() {
             $('#categorySearchSelect').val($scope.category);

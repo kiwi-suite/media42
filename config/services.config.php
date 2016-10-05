@@ -16,8 +16,6 @@ return [
 
             'Imagine'              => ImagineFactory::class,
 
-            'Media42\EventManager' => EventManagerFactory::class,
-
             MediaLink::class        => MediaLinkFactory::class,
         ],
     ],

@@ -14,12 +14,13 @@ return [
                     'media' => [
                         'type' => Segment::class,
                         'options' => [
-                            'route' => 'media/[:referrer/[:category/]]',
+                            'route' => 'media/[:referrer/:category/:mimeType/]',
                             'defaults' => [
                                 'controller' => MediaController::class,
                                 'action' => 'index',
                                 'referrer' => 'index',
                                 'category' => 'default',
+                                'mimeType' => 'all',
                             ],
                             'constraints' => [
                                 'referrer' => '(index|modal)'
@@ -28,9 +29,9 @@ return [
                         'may_terminate' => true,
                         'child_routes' => [
                             'upload' => [
-                                'type' => Literal::class,
+                                'type' => Segment::class,
                                 'options' => [
-                                    'route' => 'upload/',
+                                    'route' => 'upload/[:id/]',
                                     'defaults' => [
                                         'action' => 'upload'
                                     ],
@@ -60,15 +61,6 @@ return [
                                     'route' => 'delete/',
                                     'defaults' => [
                                         'action' => 'delete'
-                                    ],
-                                ],
-                            ],
-                            'stream' => [
-                                'type' => AngularSegment::class,
-                                'options' => [
-                                    'route' => 'stream/:id/[:dimension/]',
-                                    'defaults' => [
-                                        'action' => 'stream'
                                     ],
                                 ],
                             ],

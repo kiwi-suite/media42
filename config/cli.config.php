@@ -2,7 +2,6 @@
 namespace Media42;
 
 use Media42\Command\BulkImportCommand;
-use Media42\Command\RegenerateCommand;
 
 return [
     'cli' => [
@@ -14,13 +13,6 @@ return [
             'options_descriptions'      => [
                 '--category'            => 'the category the files are assigned to. default: "default"',
             ],
-        ],
-
-        'media-regenerate-images' => [
-            'route'                     => '[--force] [--dimension=] [--category=]',
-            'command-name'              => RegenerateCommand::class,
-            'description'               => 'Regenerate all Images',
-            'short_description'         => 'Regenerate all Images',
         ],
     ]
 ];

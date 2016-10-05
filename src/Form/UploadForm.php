@@ -9,11 +9,8 @@
 
 namespace Media42\Form;
 
-use Zend\Form\Element\File;
-use Zend\Form\Element\Text;
-use Zend\Form\Form;
-use Zend\InputFilter\FileInput;
-use Zend\InputFilter\InputFilter;
+use Admin42\FormElements\Form;
+use Media42\FormElements\File;
 
 class UploadForm extends Form
 {
@@ -22,19 +19,15 @@ class UploadForm extends Form
      */
     public function init()
     {
-        $category = new Text("category");
-        $this->add($category);
+        $this->add([
+            'type' => 'text',
+            'name' => 'category',
+        ]);
 
-        $file = new File("file");
-        $file->setAttribute("multiple", true);
-        $this->add($file);
-
-        $inputFilter = new InputFilter();
-
-        $fileInput = new FileInput("file");
-        $fileInput->setRequired(true);
-        $inputFilter->add($fileInput);
-
-        $this->setInputFilter($inputFilter);
+        $this->add([
+            'type' => File::class,
+            'name' => 'file',
+            'required' => true,
+        ]);
     }
 }

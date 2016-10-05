@@ -1,24 +1,16 @@
 <?php
-/**
- * media42 (www.raum42.at)
- *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2016 raum42 OG (http://www.raum42.at)
- *
- */
-
-namespace Media42\Service;
+namespace Media42\Event\Service;
 
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
-use Media42\Event\MediaEvent;
-use Zend\EventManager\EventManager;
+use Media42\Event\MediaEventListener;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class EventManagerFactory implements FactoryInterface
+class MediaEventListenerFactory implements FactoryInterface
 {
+
     /**
      * Create an object
      *
@@ -33,9 +25,6 @@ class EventManagerFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $eventManager = new EventManager();
-        $eventManager->setEventPrototype(new MediaEvent());
-
-        return $eventManager;
+        return new MediaEventListener($container);
     }
 }
