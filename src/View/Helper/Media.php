@@ -1,10 +1,13 @@
 <?php
-/**
- * media42 (www.raum42.at)
+
+/*
+ * media42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2016 raum42 OG (http://www.raum42.at)
- *
+ * @package media42
+ * @link https://github.com/raum42/media42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Media42\View\Helper;
@@ -12,7 +15,6 @@ namespace Media42\View\Helper;
 use Media42\Model\Media as MediaModel;
 use Media42\TableGateway\MediaTableGateway;
 use Psr\Cache\CacheItemPoolInterface;
-use Zend\Cache\Storage\StorageInterface;
 use Zend\View\Helper\AbstractHelper;
 
 class Media extends AbstractHelper
@@ -58,7 +60,7 @@ class Media extends AbstractHelper
     public function getMedia($mediaId)
     {
         if (empty($mediaId)) {
-            return null;
+            return;
         }
         $item = $this->cache->getItem($mediaId);
 

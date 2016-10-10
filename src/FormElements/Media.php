@@ -1,4 +1,15 @@
 <?php
+
+/*
+ * media42
+ *
+ * @package media42
+ * @link https://github.com/raum42/media42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
+ */
+
 namespace Media42\FormElements;
 
 use Admin42\FormElements\AngularAwareInterface;
@@ -13,12 +24,12 @@ class Media extends Element implements AngularAwareInterface, InputProviderInter
     /**
      * @var string
      */
-    protected $categorySelection = "*";
+    protected $categorySelection = '*';
 
     /**
      * @var string
      */
-    protected $typeSelection = "*";
+    protected $typeSelection = '*';
 
     /**
      * @param array $options
@@ -52,6 +63,7 @@ class Media extends Element implements AngularAwareInterface, InputProviderInter
     public function setCategorySelection($categorySelection)
     {
         $this->categorySelection = $categorySelection;
+
         return $this;
     }
 
@@ -70,6 +82,7 @@ class Media extends Element implements AngularAwareInterface, InputProviderInter
     public function setTypeSelection($typeSelection)
     {
         $this->typeSelection = $typeSelection;
+
         return $this;
     }
 

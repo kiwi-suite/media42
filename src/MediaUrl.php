@@ -1,10 +1,13 @@
 <?php
-/**
- * media42 (www.raum42.at)
+
+/*
+ * media42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2016 raum42 OG (http://www.raum42.at)
- *
+ * @package media42
+ * @link https://github.com/raum42/media42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Media42;
@@ -54,16 +57,16 @@ class MediaUrl
     {
         $media = $this->loadMedia($mediaId);
         if (empty($media)) {
-            return "";
+            return '';
         }
 
-        if (substr($media->getMimeType(), 0, 6) != "image/" || $dimension === null) {
+        if (substr($media->getMimeType(), 0, 6) != 'image/' || $dimension === null) {
             return $this->mediaOptions->getUrl() . $media->getDirectory() . $media->getFilename();
         }
 
         $dimension = $this->mediaOptions->getDimension($dimension);
         if ($dimension === null) {
-            return "";
+            return '';
         }
 
         $pos = strrpos($media->getFilename(), '.');
@@ -88,7 +91,7 @@ class MediaUrl
     public function loadMedia($mediaId)
     {
         if (empty($mediaId)) {
-            return null;
+            return;
         }
         $item = $this->cache->getItem($mediaId);
 

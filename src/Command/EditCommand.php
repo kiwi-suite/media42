@@ -1,10 +1,13 @@
 <?php
-/**
- * media42 (www.raum42.at)
+
+/*
+ * media42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2016 raum42 OG (http://www.raum42.at)
- *
+ * @package media42
+ * @link https://github.com/raum42/media42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Media42\Command;
@@ -20,7 +23,6 @@ use Zend\Stdlib\Glob;
 
 class EditCommand extends AbstractCommand
 {
-
     /**
      * @var int
      */
@@ -53,6 +55,7 @@ class EditCommand extends AbstractCommand
     public function setMediaId($mediaId)
     {
         $this->mediaId = (int) $mediaId;
+
         return $this;
     }
 
@@ -63,6 +66,7 @@ class EditCommand extends AbstractCommand
     public function setMedia($media)
     {
         $this->media = $media;
+
         return $this;
     }
 
@@ -73,6 +77,7 @@ class EditCommand extends AbstractCommand
     public function setFilename($filename)
     {
         $this->filename = $filename;
+
         return $this;
     }
 
@@ -94,11 +99,11 @@ class EditCommand extends AbstractCommand
         }
 
         if (!($this->media instanceof Media)) {
-            $this->addError("media", "invalid media");
+            $this->addError('media', 'invalid media');
         }
 
         if (empty($this->filename)) {
-            $this->addError("title", "filename can't be empty");
+            $this->addError('title', "filename can't be empty");
         }
 
         $this->oldFilename = $this->media->getFilename();
@@ -168,7 +173,7 @@ class EditCommand extends AbstractCommand
                 $currentFilenameParts['filename']
             );
             $newFilename = $currentFilenameParts['dirname'] . '/' . $newFilename;
-            $newFilename .= '.' .$currentFilenameParts['extension'];
+            $newFilename .= '.' . $currentFilenameParts['extension'];
 
             rename($file, $newFilename);
         }

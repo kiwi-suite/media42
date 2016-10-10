@@ -1,10 +1,13 @@
 <?php
-/**
- * media42 (www.raum42.at)
+
+/*
+ * media42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2016 raum42 OG (http://www.raum42.at)
- *
+ * @package media42
+ * @link https://github.com/raum42/media42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Media42\Command;
@@ -17,7 +20,6 @@ use Media42\Event\MediaEvent;
 use Media42\MediaOptions;
 use Media42\Model\Media;
 use Media42\TableGateway\MediaTableGateway;
-use Zend\Json\Json;
 
 class ImageCropCommand extends AbstractCommand
 {
@@ -78,6 +80,7 @@ class ImageCropCommand extends AbstractCommand
     public function setMediaId($mediaId)
     {
         $this->mediaId = $mediaId;
+
         return $this;
     }
 
@@ -88,6 +91,7 @@ class ImageCropCommand extends AbstractCommand
     public function setMedia(Media $media)
     {
         $this->media = $media;
+
         return $this;
     }
 
@@ -98,6 +102,7 @@ class ImageCropCommand extends AbstractCommand
     public function setDimensionName($dimensionName)
     {
         $this->dimensionName = $dimensionName;
+
         return $this;
     }
 
@@ -108,6 +113,7 @@ class ImageCropCommand extends AbstractCommand
     public function setDimension($dimension)
     {
         $this->dimension = $dimension;
+
         return $this;
     }
 
@@ -118,6 +124,7 @@ class ImageCropCommand extends AbstractCommand
     public function setBoxWidth($boxWidth)
     {
         $this->boxWidth = $boxWidth;
+
         return $this;
     }
 
@@ -128,6 +135,7 @@ class ImageCropCommand extends AbstractCommand
     public function setBoxHeight($boxHeight)
     {
         $this->boxHeight = $boxHeight;
+
         return $this;
     }
 
@@ -138,6 +146,7 @@ class ImageCropCommand extends AbstractCommand
     public function setOffsetX($offsetX)
     {
         $this->offsetX = $offsetX;
+
         return $this;
     }
 
@@ -148,6 +157,7 @@ class ImageCropCommand extends AbstractCommand
     public function setOffsetY($offsetY)
     {
         $this->offsetY = $offsetY;
+
         return $this;
     }
 
@@ -161,7 +171,7 @@ class ImageCropCommand extends AbstractCommand
         }
 
         if (empty($this->media)) {
-            $this->addError("media", "media not found");
+            $this->addError('media', 'media not found');
 
             return;
         }
@@ -173,7 +183,8 @@ class ImageCropCommand extends AbstractCommand
         }
 
         if (!$this->dimension === null) {
-            $this->addError("dimensions", "dimensionName invalid");
+            $this->addError('dimensions', 'dimensionName invalid');
+
             return;
         }
 
@@ -192,10 +203,10 @@ class ImageCropCommand extends AbstractCommand
     {
         $sourceFullPath = $this->mediaOptions->getPath() . $this->media->getDirectory() . $this->media->getFilename();
 
-        $filenameParts = explode(".", $this->media->getFilename());
+        $filenameParts = explode('.', $this->media->getFilename());
 
         $extension = array_pop($filenameParts);
-        $filename = implode(".", $filenameParts);
+        $filename = implode('.', $filenameParts);
 
         $filename .= '-'
             . (($this->dimension['width'] == 'auto') ? '000' : $this->dimension['width'])
@@ -220,7 +231,7 @@ class ImageCropCommand extends AbstractCommand
                 $fullPath,
                 [
                     'jpeg_quality' => 75,
-                    'png_compression_level' => 7
+                    'png_compression_level' => 7,
                 ]
             );
 
@@ -230,14 +241,14 @@ class ImageCropCommand extends AbstractCommand
 
 
         $meta = $this->media->getMeta();
-        if(empty($meta)) {
+        if (empty($meta)) {
             $media = [];
         }
         $meta[$this->dimensionName] = [
             'x' => $this->offsetX,
             'y' => $this->offsetY,
             'width' => $this->boxWidth,
-            'height' => $this->boxHeight
+            'height' => $this->boxHeight,
         ];
         $this->media->setMeta($meta);
         if ($this->media->hasChanged()) {

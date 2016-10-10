@@ -1,4 +1,15 @@
 <?php
+
+/*
+ * media42
+ *
+ * @package media42
+ * @link https://github.com/raum42/media42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
+ */
+
 namespace Media42\Imagine\Service;
 
 use Interop\Container\ContainerInterface;
@@ -26,7 +37,7 @@ class ImagineFactory implements FactoryInterface
         $mediaConfig = $container->get('config')['media'];
         $imagineAdapter = ucfirst($mediaConfig['images']['adapter']);
 
-        $class = 'Imagine\\' . $imagineAdapter .'\\Imagine';
+        $class = 'Imagine\\' . $imagineAdapter . '\\Imagine';
 
         return new $class;
     }

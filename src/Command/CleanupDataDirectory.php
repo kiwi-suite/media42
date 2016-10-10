@@ -1,10 +1,13 @@
 <?php
-/**
- * media42 (www.raum42.at)
+
+/*
+ * media42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2016 raum42 OG (http://www.raum42.at)
- *
+ * @package media42
+ * @link https://github.com/raum42/media42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Media42\Command;
@@ -38,6 +41,7 @@ class CleanupDataDirectory extends AbstractCommand
     public function setMediaId($mediaId)
     {
         $this->mediaId = $mediaId;
+
         return $this;
     }
 
@@ -48,6 +52,7 @@ class CleanupDataDirectory extends AbstractCommand
     public function setMedia(Media $media)
     {
         $this->media = $media;
+
         return $this;
     }
 
@@ -61,7 +66,7 @@ class CleanupDataDirectory extends AbstractCommand
         }
 
         if (empty($this->media)) {
-            $this->addError("media", "media not found");
+            $this->addError('media', 'media not found');
         }
     }
 
@@ -80,7 +85,7 @@ class CleanupDataDirectory extends AbstractCommand
 
         $dir = scandir($baseDir);
         foreach ($dir as $_entry) {
-            if ($_entry == ".." || $_entry == ".") {
+            if ($_entry == '..' || $_entry == '.') {
                 continue;
             }
 
@@ -90,11 +95,10 @@ class CleanupDataDirectory extends AbstractCommand
         }
 
         while (rtrim($baseDir, DIRECTORY_SEPARATOR) != rtrim($mediaOptions->getPath(), DIRECTORY_SEPARATOR)) {
-
             $dir = scandir($baseDir);
             $empty = true;
             foreach ($dir as $_entry) {
-                if ($_entry == ".." || $_entry == ".") {
+                if ($_entry == '..' || $_entry == '.') {
                     continue;
                 }
                 $empty = false;
@@ -103,7 +107,6 @@ class CleanupDataDirectory extends AbstractCommand
 
             if ($empty === false) {
                 break;
-
             }
             @rmdir($baseDir);
             $baseDir = dirname($baseDir);
