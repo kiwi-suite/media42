@@ -2,7 +2,7 @@
     <div class="col-sm-3 col-md-2 control-label">
         <div class="pull-left hidden-sm hidden-xs">
             <span class="fa fa-fw text-danger" ng-class="{'fa-exclamation-triangle': formData.errors.length}"></span>
-            <a ng-show="formData.value.length > 0" class="text-light" ng-click="empty()">
+            <a ng-show="formData.value.id > 0" class="text-light" ng-click="empty()">
                 <i class="fa fa-fw fa-trash"></i>
             </a>
         </div>
@@ -15,18 +15,34 @@
         </div>
         <div class="clearfix"></div>
     </div>
-    <div class="col-sm-9 col-md-10">
-        <input type="hidden" name="{{ formData.name }}" value="">
+    <div ng-show="formData.value.id > 0" class="col-sm-2 col-md-2">
+        <div class="item" style="overflow: hidden;">
+            <div class="pos-rlt bg-for-transparent">
+                <div class="top w-full m-l-sm">
+                    <a ng-show="isImage(formData.value)" class="m-t-sm btn btn-rounded btn-icon btn-default" ng-href="{{ getSrc(formData.value) }}" lightbox>
+                        <i class="fa fa-search-plus"></i>
+                    </a>
+                    <a class="m-t-sm btn btn-rounded btn-icon btn-default" ng-href="<?= $this->url('admin/media/edit', ['id' => '{{formData.value.id}}'])?>" target="_blank">
+                        <i class="fa fa-edit"></i>
+                    </a>
+                </div>
+                <div ng-show="!isImage(formData.value)" class="center text-center m-t-n w-full r-2x">
+                    <i class="fa fa-5x" ng-class="getDocumentClass(formData.value)"></i>
+                </div>
+
+                <img ng-show="isImage(formData.value)" ng-src="{{ getSrc(formData.value, 'admin_thumbnail') }}" class="img-full r r-2x">
+                <img ng-show="!isImage(formData.value)" src="<?= $this->assetUrl('assets/admin/admin42/images/document-placeholder.jpg') ?>" class="img-full r r-2x">
+            </div>
+        </div>
+    </div>
+    <div ng-class="{'col-sm-9': formData.value.id == null, 'col-md-10': formData.value.id == null, 'col-sm-7': formData.value.id > 0, 'col-md-8': formData.value.id > 0}">
+        <input type="hidden" name="{{ formData.name }}" value="{{ formData.value.id }}">
         <div class="input-group">
-            <input type="text" class="form-control" value="" disabled>
+            <input type="text" class="form-control" value="{{ formData.value.filename }}" disabled>
             <span class="input-group-btn">
                 <a type="button" class="btn btn-default" ng-click="selectMedia()">
                     <i class="fa fa-check"></i>
                     <?= $this->translate('button.select', 'admin') ?>
-                </a>
-                <a ng-href="{{getSrc(media)}}" class="btn btn-default" target="_blank">
-                    <i class="fa fa-download"></i>
-                    <?= $this->translate('button.download', 'admin') ?>
                 </a>
             </span>
         </div>

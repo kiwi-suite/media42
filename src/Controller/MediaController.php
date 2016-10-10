@@ -43,7 +43,6 @@ class MediaController extends AbstractAdminController
         $viewModel = new ViewModel([
             'uploadForm' => $this->getForm(UploadForm::class),
             'maxFileSize' => MaxUploadFileSize::getSize(),
-            'mediaCategories' => $mediaOptions->getCategories(),
             'uploadHost' => $mediaOptions->getUploadHost(),
         ]);
 

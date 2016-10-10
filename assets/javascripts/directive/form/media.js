@@ -8,7 +8,7 @@ angular.module('media42')
             scope: {
                 elementDataId: '@'
             },
-            controller: ['$scope', 'jsonCache', '$formService', '$uibModal', function($scope, jsonCache, $formService, $uibModal) {
+            controller: ['$scope', 'jsonCache', '$formService', '$uibModal', 'MediaService', function($scope, jsonCache, $formService, $uibModal, MediaService) {
                 $scope.formData = jsonCache.get($scope.elementDataId);
 
                 $scope.onChange = function () {
@@ -16,8 +16,26 @@ angular.module('media42')
                 };
 
                 $scope.empty = function() {
-                    $scope.formData.value = "";
+                    $scope.formData.value = {
+                        id: null,
+                        directory: null,
+                        filename: null,
+                        mimeType: null,
+                        size: null
+                    };
                     $scope.onChange();
+                };
+
+                $scope.isImage = function(item) {
+                    return MediaService.isImage(item.mimeType);
+                };
+
+                $scope.getDocumentClass = function(item) {
+                    return MediaService.getDocumentIcon(item.mimeType);
+                };
+
+                $scope.getSrc = function(media, dimension) {
+                    return MediaService.getMediaUrl(media.directory, media.filename, media.mimeType, dimension);
                 };
 
                 $scope.selectMedia = function() {
@@ -55,7 +73,7 @@ angular.module('media42')
 
                     modalInstance.result.then(function(media) {
                         if (media !== null) {
-                            $scope.media = media;
+                            $scope.formData.value = media;
                         }
                     }, function () {
 

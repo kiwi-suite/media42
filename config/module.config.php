@@ -1,7 +1,6 @@
 <?php
 namespace Media42;
 
-use Media42\Link\Adapter\MediaLink;
 use Media42\View\Helper\Service\MediaFactory;
 use Media42\View\Helper\Service\MediaUrlFactory;
 
@@ -38,8 +37,8 @@ return [
 
     'view_helpers' => [
         'factories' => [
-            'media'            => MediaFactory::class,
-            'mediaUrl'         => MediaUrlFactory::class,
+            'media'             => MediaFactory::class,
+            'mediaUrl'          => MediaUrlFactory::class,
         ],
     ],
 

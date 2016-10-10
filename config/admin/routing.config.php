@@ -14,16 +14,17 @@ return [
                     'media' => [
                         'type' => Segment::class,
                         'options' => [
-                            'route' => 'media/[:referrer/:category/:mimeType/]',
+                            'route' => 'media/[:referrer/:typeSelection/:categorySelection/]',
                             'defaults' => [
                                 'controller' => MediaController::class,
                                 'action' => 'index',
                                 'referrer' => 'index',
-                                'category' => 'default',
-                                'mimeType' => 'all',
+                                'categorySelection' => '*',
+                                'typeSelection' => '*',
                             ],
                             'constraints' => [
-                                'referrer' => '(index|modal)'
+                                'referrer' => '(index|modal)',
+                                'typeSelection' => '(\*|pdf|images)',
                             ],
                         ],
                         'may_terminate' => true,

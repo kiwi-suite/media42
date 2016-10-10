@@ -12,7 +12,7 @@ angular.module('media42')
             scope: {
                 elementDataId: '@'
             },
-            controller: ['$scope', 'jsonCache', '$formService', '$uibModal', function($scope, jsonCache, $formService, $uibModal) {
+            controller: ['$scope', 'jsonCache', '$formService', '$uibModal', 'MediaService', function($scope, jsonCache, $formService, $uibModal, MediaService) {
                 $scope.formData = jsonCache.get($scope.elementDataId);
 
                 $scope.onChange = function () {
@@ -20,8 +20,26 @@ angular.module('media42')
                 };
 
                 $scope.empty = function() {
-                    $scope.formData.value = "";
+                    $scope.formData.value = {
+                        id: null,
+                        directory: null,
+                        filename: null,
+                        mimeType: null,
+                        size: null
+                    };
                     $scope.onChange();
+                };
+
+                $scope.isImage = function(item) {
+                    return MediaService.isImage(item.mimeType);
+                };
+
+                $scope.getDocumentClass = function(item) {
+                    return MediaService.getDocumentIcon(item.mimeType);
+                };
+
+                $scope.getSrc = function(media, dimension) {
+                    return MediaService.getMediaUrl(media.directory, media.filename, media.mimeType, dimension);
                 };
 
                 $scope.selectMedia = function() {
@@ -59,7 +77,7 @@ angular.module('media42')
 
                     modalInstance.result.then(function(media) {
                         if (media !== null) {
-                            $scope.media = media;
+                            $scope.formData.value = media;
                         }
                     }, function () {
 
@@ -325,79 +343,6 @@ angular.module('media42')
 }]);
 ;
 angular.module('media42')
-    .controller('FileSelectorController', ['$scope', '$attrs', 'jsonCache', '$uibModal', 'MediaService', function ($scope, $attrs, jsonCache, $uibModal, MediaService) {
-        $scope.media = jsonCache.get($attrs.jsonDataId);
-
-        $scope.tabs = {
-            media: {
-                active: $attrs.ngType !== 'file',
-                disabled: false
-            },
-            sitemap: {
-                active: $attrs.ngType === 'file',
-                disabled: $attrs.ngType !== 'file'
-            }
-        };
-
-        $scope.clearMedia = function() {
-            $scope.media = [];
-        }
-
-        $scope.isImage = function() {
-            if (angular.isUndefined($scope.media.mimeType)) {
-                return false;
-            }
-            return ($scope.media.mimeType.substr(0, 6) == "image/");
-        };
-
-        $scope.getSrc = function(media, dimension) {
-            return MediaService.getMediaUrl(media.directory, media.filename, media.mimeType, dimension);
-        };
-
-        $scope.selectMedia = function() {
-            var modalInstance = $uibModal.open({
-                animation: true,
-                templateUrl: $attrs.modalTemplate,
-                controller: 'MediaModalSelectorController',
-                size: 'lg'
-            });
-
-            modalInstance.result.then(function(media) {
-                if (media !== null) {
-                    $scope.media = media;
-                }
-            }, function () {
-
-            });
-        };
-    }]);
-
-angular.module('media42')
-    .controller('MediaModalSelectorController', ['$scope', '$uibModalInstance', function ($scope, $uibModalInstance) {
-        var selectedMedia = null;
-
-
-        $scope.selectMedia = function(media) {
-            if ($scope.selectedMedia == media.id) {
-                $scope.selectedMedia = null;
-                selectedMedia = null;
-
-                return;
-            }
-            $scope.selectedMedia = media.id;
-            selectedMedia = media;
-        };
-
-        $scope.ok = function () {
-            $uibModalInstance.close(selectedMedia);
-        };
-
-        $scope.cancel = function () {
-            $uibModalInstance.dismiss('cancel');
-        };
-    }]);
-;
-angular.module('media42')
     .controller('MediaController', ['$scope', 'FileUploader', '$attrs', '$http', '$sessionStorage', '$templateCache', 'MediaService', '$uibModal', function ($scope, FileUploader, $attrs, $http, $sessionStorage, $templateCache, MediaService, $uibModal) {
         $templateCache.put('template/smart-table/pagination.html',
             '<nav ng-if="numPages && pages.length >= 2"><ul class="pagination">' +
@@ -410,7 +355,12 @@ angular.module('media42')
 
         var currentTableState = {};
         var url = $attrs.url;
+
         var persistNamespace = null;
+        if (angular.isDefined($attrs.persist) && $attrs.persist.length > 0) {
+            persistNamespace = $attrs.persist;
+        }
+
         var isInitialCall = true;
 
         $scope.isCollapsed = true;
@@ -422,9 +372,7 @@ angular.module('media42')
 
         $scope.category = $attrs.category;
 
-        if (angular.isDefined($attrs.persist) && $attrs.persist.length > 0) {
-            persistNamespace = $attrs.persist;
-        }
+        var categorySelectElement = angular.element('#media-category-select');
 
         var uploader = $scope.uploader = new FileUploader({
             url: $attrs.uploadUrl,
@@ -441,6 +389,12 @@ angular.module('media42')
                 }
             }]
         });
+
+        $scope.$watch('category',function(newValue, oldValue) {
+            if(newValue != oldValue && categorySelectElement.val() != newValue) {
+                categorySelectElement.val(newValue).trigger('change');
+            }
+        },true);
 
         $scope.delete = function(deleteUrl, id, modalTitle, modalContent) {
             $scope.deleteLoading = true;
@@ -480,11 +434,6 @@ angular.module('media42')
             });
         }
 
-        $scope.uploadCategoryChange = function() {
-            $('#categorySearchSelect').val($scope.category);
-            angular.element($('#categorySearchSelect')[0]).triggerHandler('input');
-        }
-
         uploader.onBeforeUploadItem = function onBeforeUploadItem(item) {
             item.formData = [{
                 category: $scope.category
@@ -493,16 +442,17 @@ angular.module('media42')
 
 
         uploader.onCompleteAll = function() {
+
             requestFromServer(url, currentTableState);
             $scope.errorFiles = [];
         };
 
         $scope.isImage = function(item) {
-            return (item.mimeType.substr(0, 6) == "image/");
+            return MediaService.isImage(item.mimeType);
         };
 
         $scope.getDocumentClass = function(item) {
-            return "fa-file";
+            return MediaService.getDocumentIcon(item.mimeType);
         };
 
         $scope.callServer = function (tableState) {
@@ -519,6 +469,13 @@ angular.module('media42')
                 $sessionStorage.smartTable[persistNamespace] = angular.toJson(tableState);
             }
 
+            if (angular.isDefined(tableState['search']) && angular.isDefined(tableState['search']['predicateObject']) && angular.isDefined(tableState['search']['predicateObject']['categorySelection'])) {
+                var categorySelection = tableState['search']['predicateObject']['categorySelection'];
+
+                if (categorySelection != '*' && categorySelection != $scope.category) {
+                    $scope.category = categorySelection;
+                }
+            }
             requestFromServer(url, tableState);
         };
 
@@ -576,9 +533,16 @@ angular.module('media42')
 angular.module('media42')
     .service('MediaService', ['jsonCache', function(jsonCache) {
             this.getMediaUrl = function(directory, filename, mimeType, dimension) {
-                if (angular.isUndefined(directory) || angular.isUndefined(filename)) {
+                if (angular.isUndefined(directory) || directory == null) {
                     return "";
                 }
+                if (angular.isUndefined(filename) || filename == null) {
+                    return "";
+                }
+                if (angular.isUndefined(mimeType) || mimeType == null) {
+                    return "";
+                }
+
                 var mediaConfig = jsonCache.get("mediaConfig");
 
                 directory = directory.replace("data/media", "");
@@ -594,12 +558,31 @@ angular.module('media42')
                 var currentDimension = mediaConfig.dimensions[dimension];
 
                 var extension = filename.split(".").pop();
-                var oldFilename = filename;
                 filename = filename.substr(0, filename.length - extension.length -1);
 
                 filename = filename + "-" + ((currentDimension.width == "auto") ? "" : currentDimension.width) + "x" + ((currentDimension.height == "auto") ? "" : currentDimension.height) + "." + extension;
 
                 return mediaConfig.baseUrl + directory + filename;
             }
+
+            this.getDocumentIcon = function(mimeType) {
+                if (angular.isUndefined(mimeType) || mimeType == null) {
+                    return "";
+                }
+
+                if (mimeType == "application/pdf") {
+                    return "fa-file-pdf-o";
+                }
+
+                return "fa-file"
+            };
+
+            this.isImage = function(mimeType) {
+                if (angular.isUndefined(mimeType) || mimeType == null) {
+                    return false;
+                }
+
+                return (mimeType.substr(0, 6) == "image/");
+            };
         }]
     );

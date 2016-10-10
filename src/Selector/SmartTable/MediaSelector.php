@@ -29,9 +29,9 @@ class MediaSelector extends AbstractSmartTableSelector
 
         $where = $this->getWhere();
 
-        if (!empty($this->search['typeSearch']) && in_array($this->search['typeSearch'], ['images', 'pdf'])) {
+        if (!empty($this->search['typeSelection']) && in_array($this->search['typeSelection'], ['images', 'pdf'])) {
             $typeSearchWhere = new Where();
-            if ($this->search['typeSearch'] == 'images') {
+            if ($this->search['typeSelection'] == 'images') {
                 $typeSearchWhere->in('mimeType', [
                     'image/gif',
                     'image/jpeg',
@@ -40,7 +40,7 @@ class MediaSelector extends AbstractSmartTableSelector
                     'image/bmp',
                     'image/bmp',
                 ]);
-            } elseif ($this->search['typeSearch'] == 'pdf') {
+            } elseif ($this->search['typeSelection'] == 'pdf') {
                 $typeSearchWhere->in('mimeType', [
                     'application/pdf',
                 ]);
@@ -50,6 +50,19 @@ class MediaSelector extends AbstractSmartTableSelector
                 $where = $typeSearchWhere;
             } else {
                 $predicateSet = new PredicateSet([$where, $typeSearchWhere], PredicateSet::COMBINED_BY_AND);
+                $where = $predicateSet;
+            }
+        }
+
+        if (!empty($this->search['categorySelection']) && $this->search['categorySelection'] !== '*') {
+            $categorySearchWhere = new Where();
+
+            $categorySearchWhere->equalTo('category', $this->search['categorySelection']);
+
+            if (empty($where)) {
+                $where = $categorySearchWhere;
+            } else {
+                $predicateSet = new PredicateSet([$where, $categorySearchWhere], PredicateSet::COMBINED_BY_AND);
                 $where = $predicateSet;
             }
         }
@@ -85,7 +98,7 @@ class MediaSelector extends AbstractSmartTableSelector
      */
     protected function getSearchAbleColumns()
     {
-        return ['id', 'filename', 'category', 'mimeType'];
+        return ['filename'];
     }
 
     /**

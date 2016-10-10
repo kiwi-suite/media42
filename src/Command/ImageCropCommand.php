@@ -230,14 +230,16 @@ class ImageCropCommand extends AbstractCommand
 
 
         $meta = $this->media->getMeta();
-        $meta = (strlen($meta)) ? Json::decode($meta, true) : [];
+        if(empty($meta)) {
+            $media = [];
+        }
         $meta[$this->dimensionName] = [
             'x' => $this->offsetX,
             'y' => $this->offsetY,
             'width' => $this->boxWidth,
             'height' => $this->boxHeight
         ];
-        $this->media->setMeta(Json::encode($meta));
+        $this->media->setMeta($meta);
         if ($this->media->hasChanged()) {
             $this->media->setUpdated(new \DateTime());
         }

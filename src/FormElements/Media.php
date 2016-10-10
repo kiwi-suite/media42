@@ -11,11 +11,65 @@ class Media extends Element implements AngularAwareInterface, InputProviderInter
     use ElementTrait;
 
     /**
+     * @var string
+     */
+    protected $categorySelection = "*";
+
+    /**
+     * @var string
+     */
+    protected $typeSelection = "*";
+
+    /**
      * @param array $options
      * @return $this
      */
     public function setOptions($options)
     {
+        if (isset($options['categorySelection'])) {
+            $this->setCategorySelection($options['categorySelection']);
+        }
+
+        if (isset($options['typeSelection']) && in_array($options['typeSelection'], ['*', 'pdf', 'images'])) {
+            $this->setTypeSelection($options['typeSelection']);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCategorySelection()
+    {
+        return $this->categorySelection;
+    }
+
+    /**
+     * @param string $categorySelection
+     * @return Media
+     */
+    public function setCategorySelection($categorySelection)
+    {
+        $this->categorySelection = $categorySelection;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTypeSelection()
+    {
+        return $this->typeSelection;
+    }
+
+    /**
+     * @param string $typeSelection
+     * @return Media
+     */
+    public function setTypeSelection($typeSelection)
+    {
+        $this->typeSelection = $typeSelection;
         return $this;
     }
 

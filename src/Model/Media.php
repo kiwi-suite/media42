@@ -12,12 +12,6 @@ use Core42\Model\AbstractModel;
  * @method string getFilename() getFilename()
  * @method Media setCategory() setCategory(string $category)
  * @method string getCategory() getCategory()
- * @method Media setTitle() setTitle(string $title)
- * @method string getTitle() getTitle()
- * @method Media setDescription() setDescription(string $description)
- * @method string getDescription() getDescription()
- * @method Media setKeywords() setKeywords(string $keywords)
- * @method string getKeywords() getKeywords()
  * @method Media setMimeType() setMimeType(string $mimeType)
  * @method string getMimeType() getMimeType()
  * @method Media setSize() setSize(int $size)
@@ -40,9 +34,6 @@ class Media extends AbstractModel
         'directory',
         'filename',
         'category',
-        'title',
-        'description',
-        'keywords',
         'mimeType',
         'size',
         'meta',

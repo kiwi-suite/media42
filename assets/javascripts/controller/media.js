@@ -11,7 +11,12 @@ angular.module('media42')
 
         var currentTableState = {};
         var url = $attrs.url;
+
         var persistNamespace = null;
+        if (angular.isDefined($attrs.persist) && $attrs.persist.length > 0) {
+            persistNamespace = $attrs.persist;
+        }
+
         var isInitialCall = true;
 
         $scope.isCollapsed = true;
@@ -23,9 +28,7 @@ angular.module('media42')
 
         $scope.category = $attrs.category;
 
-        if (angular.isDefined($attrs.persist) && $attrs.persist.length > 0) {
-            persistNamespace = $attrs.persist;
-        }
+        var categorySelectElement = angular.element('#media-category-select');
 
         var uploader = $scope.uploader = new FileUploader({
             url: $attrs.uploadUrl,
@@ -42,6 +45,12 @@ angular.module('media42')
                 }
             }]
         });
+
+        $scope.$watch('category',function(newValue, oldValue) {
+            if(newValue != oldValue && categorySelectElement.val() != newValue) {
+                categorySelectElement.val(newValue).trigger('change');
+            }
+        },true);
 
         $scope.delete = function(deleteUrl, id, modalTitle, modalContent) {
             $scope.deleteLoading = true;
@@ -81,11 +90,6 @@ angular.module('media42')
             });
         }
 
-        $scope.uploadCategoryChange = function() {
-            $('#categorySearchSelect').val($scope.category);
-            angular.element($('#categorySearchSelect')[0]).triggerHandler('input');
-        }
-
         uploader.onBeforeUploadItem = function onBeforeUploadItem(item) {
             item.formData = [{
                 category: $scope.category
@@ -94,16 +98,17 @@ angular.module('media42')
 
 
         uploader.onCompleteAll = function() {
+
             requestFromServer(url, currentTableState);
             $scope.errorFiles = [];
         };
 
         $scope.isImage = function(item) {
-            return (item.mimeType.substr(0, 6) == "image/");
+            return MediaService.isImage(item.mimeType);
         };
 
         $scope.getDocumentClass = function(item) {
-            return "fa-file";
+            return MediaService.getDocumentIcon(item.mimeType);
         };
 
         $scope.callServer = function (tableState) {
@@ -120,6 +125,13 @@ angular.module('media42')
                 $sessionStorage.smartTable[persistNamespace] = angular.toJson(tableState);
             }
 
+            if (angular.isDefined(tableState['search']) && angular.isDefined(tableState['search']['predicateObject']) && angular.isDefined(tableState['search']['predicateObject']['categorySelection'])) {
+                var categorySelection = tableState['search']['predicateObject']['categorySelection'];
+
+                if (categorySelection != '*' && categorySelection != $scope.category) {
+                    $scope.category = categorySelection;
+                }
+            }
             requestFromServer(url, tableState);
         };
 
