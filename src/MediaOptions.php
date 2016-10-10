@@ -1,10 +1,13 @@
 <?php
-/**
- * media42 (www.raum42.at)
+
+/*
+ * media42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2016 raum42 OG (http://www.raum42.at)
- *
+ * @package media42
+ * @link https://github.com/raum42/media42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Media42;
@@ -36,7 +39,7 @@ class MediaOptions extends AbstractOptions
     /**
      * @var string
      */
-    protected $uploadHost = "";
+    protected $uploadHost = '';
 
     /**
      * @param $path
@@ -69,6 +72,7 @@ class MediaOptions extends AbstractOptions
     public function setUrl($url)
     {
         $this->url = $url;
+
         return $this;
     }
 
@@ -79,6 +83,7 @@ class MediaOptions extends AbstractOptions
     public function setImages(array $images)
     {
         $this->images = $images;
+
         return $this;
     }
 
@@ -134,7 +139,6 @@ class MediaOptions extends AbstractOptions
         if ($this->hasDimension($dimension)) {
             return $this->images['dimensions'][$dimension];
         }
-        return null;
     }
 
     /**
@@ -144,6 +148,7 @@ class MediaOptions extends AbstractOptions
     public function setCategories($categories)
     {
         $this->categories = $categories;
+
         return $this;
     }
 

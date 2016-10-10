@@ -1,10 +1,13 @@
 <?php
-/**
- * media42 (www.raum42.at)
+
+/*
+ * media42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2016 raum42 OG (http://www.raum42.at)
- *
+ * @package media42
+ * @link https://github.com/raum42/media42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Media42\Controller;
@@ -15,7 +18,6 @@ use Admin42\Mvc\Controller\AbstractAdminController;
 use Core42\Stdlib\MaxUploadFileSize;
 use Core42\View\Model\JsonModel;
 use Media42\Command\ImageCropCommand;
-use Media42\Command\StreamCommand;
 use Media42\Command\UploadCommand;
 use Media42\Form\EditForm;
 use Media42\Form\UploadForm;
@@ -33,8 +35,7 @@ class MediaController extends AbstractAdminController
      */
     public function indexAction()
     {
-        if ($this->getRequest()->isXmlHttpRequest() && $this->params("referrer") == "index") {
-
+        if ($this->getRequest()->isXmlHttpRequest() && $this->params('referrer') == 'index') {
             return $this->getSelector(SmartTableSelector::class)->getResult();
         }
 
@@ -46,7 +47,7 @@ class MediaController extends AbstractAdminController
             'uploadHost' => $mediaOptions->getUploadHost(),
         ]);
 
-        if ($this->params('referrer') === "modal") {
+        if ($this->params('referrer') === 'modal') {
             $viewModel->setTerminal(true);
         }
 
@@ -89,7 +90,7 @@ class MediaController extends AbstractAdminController
                 return $this->redirect()->toRoute('admin/media/edit', ['id' => $media->getId()]);
             }
         } else {
-            $media = $this->getTableGateway(MediaTableGateway::class)->selectByPrimary((int) $this->params("id"));
+            $media = $this->getTableGateway(MediaTableGateway::class)->selectByPrimary((int) $this->params('id'));
             $editForm->setData($media->toArray());
         }
 
@@ -100,7 +101,7 @@ class MediaController extends AbstractAdminController
 
         $imageSize = null;
         $imageEditing = false;
-        if (count($dimensions) > 0 && substr($media->getMimeType(), 0, 6) == "image/") {
+        if (count($dimensions) > 0 && substr($media->getMimeType(), 0, 6) == 'image/') {
             $filename = $mediaOptions->getPath() . $media->getDirectory() . $media->getFilename();
             if (file_exists($filename)) {
                 $imageEditing = true;
@@ -111,7 +112,6 @@ class MediaController extends AbstractAdminController
                     'height' => $box->getHeight(),
                 ];
             }
-
         }
 
         return [
@@ -133,12 +133,12 @@ class MediaController extends AbstractAdminController
 
         /* @var ImageCropCommand $cmd */
         $cmd = $this->getCommand(ImageCropCommand::class)
-            ->setMediaId($this->params("id"))
+            ->setMediaId($this->params('id'))
             ->setBoxWidth($data['width'])
             ->setBoxHeight($data['height'])
             ->setOffsetX($data['x'])
             ->setOffsetY($data['y'])
-            ->setDimensionName($this->params("dimension"));
+            ->setDimensionName($this->params('dimension'));
         $cmd->run();
 
         if ($cmd->hasErrors()) {
@@ -174,7 +174,7 @@ class MediaController extends AbstractAdminController
                     ->setForm($form)
                     ->enableAutomaticFormFill(false)
                     ->run();
-                $jsonModel->answer = "File transfer completed";
+                $jsonModel->answer = 'File transfer completed';
             }
         }
 
@@ -190,7 +190,6 @@ class MediaController extends AbstractAdminController
         $deleteCmd = $this->getCommand(DeleteCommand::class);
 
         if ($this->getRequest()->isDelete()) {
-
             $deleteParams = [];
             parse_str($this->getRequest()->getContent(), $deleteParams);
 
@@ -201,8 +200,6 @@ class MediaController extends AbstractAdminController
                 'success' => true,
             ]);
         } elseif ($this->getRequest()->isPost()) {
-
-
             $deleteCmd->setMediaId((int) $this->params()->fromPost('id'))
                 ->run();
 
@@ -212,12 +209,12 @@ class MediaController extends AbstractAdminController
             ]);
 
             return new JsonModel([
-                'redirect' => $this->url()->fromRoute('admin/media')
+                'redirect' => $this->url()->fromRoute('admin/media'),
             ]);
         }
 
         return new JsonModel([
-            'redirect' => $this->url()->fromRoute('admin/media')
+            'redirect' => $this->url()->fromRoute('admin/media'),
         ]);
     }
 }

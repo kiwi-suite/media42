@@ -1,10 +1,13 @@
 <?php
-/**
- * media42 (www.raum42.at)
+
+/*
+ * media42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2016 raum42 OG (http://www.raum42.at)
- *
+ * @package media42
+ * @link https://github.com/raum42/media42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Media42\Command;
@@ -34,6 +37,7 @@ class BulkImportCommand extends AbstractCommand
     public function setDirectory($directory)
     {
         $this->directory = rtrim($directory, '\\/') . '/';
+
         return $this;
     }
 
@@ -44,6 +48,7 @@ class BulkImportCommand extends AbstractCommand
     public function setCategory($category)
     {
         $this->category = $category;
+
         return $this;
     }
 
@@ -69,7 +74,6 @@ class BulkImportCommand extends AbstractCommand
         $files = scandir($this->directory);
 
         foreach ($files as $file) {
-
             if ($file == '.' || $file == '..') {
                 continue;
             }
@@ -90,7 +94,5 @@ class BulkImportCommand extends AbstractCommand
     public function consoleSetup(Route $route)
     {
         $this->setDirectory($route->getMatchedParam('dir'));
-
-
     }
 }

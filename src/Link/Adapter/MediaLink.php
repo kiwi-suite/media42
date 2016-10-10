@@ -1,10 +1,13 @@
 <?php
-/**
- * media42 (www.raum42.at)
+
+/*
+ * media42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2016 raum42 OG (http://www.raum42.at)
- *
+ * @package media42
+ * @link https://github.com/raum42/media42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Media42\Link\Adapter;
@@ -45,7 +48,7 @@ class MediaLink implements AdapterInterface
     {
         $media = $this->getLinkData($value);
         if (empty($media)) {
-            return "";
+            return '';
         }
 
         return $this->mediaOptions->getUrl() . $media->getDirectory() . $media->getFilename();
@@ -59,7 +62,7 @@ class MediaLink implements AdapterInterface
     {
         $media = $this->getLinkData($value);
         if (empty($media)) {
-            return "";
+            return '';
         }
 
         return $media->getTitle();

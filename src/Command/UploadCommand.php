@@ -1,10 +1,13 @@
 <?php
-/**
- * media42 (www.raum42.at)
+
+/*
+ * media42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2016 raum42 OG (http://www.raum42.at)
- *
+ * @package media42
+ * @link https://github.com/raum42/media42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Media42\Command;
@@ -78,9 +81,10 @@ class UploadCommand extends AbstractCommand
     public function setCategory($category)
     {
         $this->category = $category;
+
         return $this;
     }
-    
+
     /**
      * @param array $uploadData
      * @return $this
@@ -88,6 +92,7 @@ class UploadCommand extends AbstractCommand
     public function setUploadData(array $uploadData)
     {
         $this->uploadData = $uploadData;
+
         return $this;
     }
 
@@ -98,16 +103,18 @@ class UploadCommand extends AbstractCommand
     public function setFilename($filename)
     {
         $this->filename = $filename;
+
         return $this;
     }
 
     /**
-     * @param boolean $checkFileUpload
+     * @param bool $checkFileUpload
      * @return $this
      */
     public function setCheckFileUpload($checkFileUpload)
     {
         $this->checkFileUpload = $checkFileUpload;
+
         return $this;
     }
 
@@ -153,7 +160,7 @@ class UploadCommand extends AbstractCommand
         $categories = array_keys($categories);
 
         if (!in_array($this->category, $categories)) {
-            $this->category = "default";
+            $this->category = 'default';
         }
 
         $this->source = $this->uploadData['tmp_name'];
@@ -193,7 +200,7 @@ class UploadCommand extends AbstractCommand
             ->setMeta([])
             ->setDirectory($directory)
             ->setMimeType($this->mimeType)
-            ->setSize(sprintf("%u", filesize($this->source)))
+            ->setSize(sprintf('%u', filesize($this->source)))
             ->setUpdated($dateTime)
             ->setCreated($dateTime);
 
@@ -209,7 +216,7 @@ class UploadCommand extends AbstractCommand
 
 
         if (!$this->moveFile($destination)) {
-            throw new \Exception("cant move uploaded file");
+            throw new \Exception('cant move uploaded file');
         }
 
         if ($this->oldMedia !== null) {
@@ -273,13 +280,14 @@ class UploadCommand extends AbstractCommand
     {
         ErrorHandler::start();
         if ($this->checkFileUpload) {
-            $result = move_uploaded_file($this->uploadData['tmp_name'], $destination);    
+            $result = move_uploaded_file($this->uploadData['tmp_name'], $destination);
         } else {
             $result = rename($this->uploadData['tmp_name'], $destination);
         }
         $warningException = ErrorHandler::stop();
         if (!$result || null !== $warningException) {
             $this->addError('uploadData', 'error at moving uploaded file');
+
             return false;
         }
 

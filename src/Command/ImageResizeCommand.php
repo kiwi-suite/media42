@@ -1,10 +1,13 @@
 <?php
-/**
- * media42 (www.raum42.at)
+
+/*
+ * media42
  *
- * @link http://www.raum42.at
- * @copyright Copyright (c) 2010-2016 raum42 OG (http://www.raum42.at)
- *
+ * @package media42
+ * @link https://github.com/raum42/media42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
  */
 
 namespace Media42\Command;
@@ -55,6 +58,7 @@ class ImageResizeCommand extends AbstractCommand
     public function setMediaId($mediaId)
     {
         $this->mediaId = $mediaId;
+
         return $this;
     }
 
@@ -65,6 +69,7 @@ class ImageResizeCommand extends AbstractCommand
     public function setMedia(Media $media)
     {
         $this->media = $media;
+
         return $this;
     }
 
@@ -75,6 +80,7 @@ class ImageResizeCommand extends AbstractCommand
     public function setDimensionName($dimensionName)
     {
         $this->dimensionName = $dimensionName;
+
         return $this;
     }
 
@@ -85,6 +91,7 @@ class ImageResizeCommand extends AbstractCommand
     public function setDimension($dimension)
     {
         $this->dimension = $dimension;
+
         return $this;
     }
 
@@ -98,7 +105,7 @@ class ImageResizeCommand extends AbstractCommand
         }
 
         if (empty($this->media)) {
-            $this->addError("media", "media not found");
+            $this->addError('media', 'media not found');
 
             return;
         }
@@ -109,7 +116,8 @@ class ImageResizeCommand extends AbstractCommand
         }
 
         if (!$this->dimension === null) {
-            $this->addError("dimensions", "dimensionName invalid");
+            $this->addError('dimensions', 'dimensionName invalid');
+
             return;
         }
 
@@ -121,14 +129,14 @@ class ImageResizeCommand extends AbstractCommand
      */
     protected function execute()
     {
-        $filenameParts = explode(".", $this->media->getFilename());
+        $filenameParts = explode('.', $this->media->getFilename());
 
         if (count($filenameParts) == 1) {
             $extension = '';
             $filename = $filenameParts[0];
         } else {
             $extension = array_pop($filenameParts);
-            $filename = implode(".", $filenameParts);
+            $filename = implode('.', $filenameParts);
         }
 
         $filename .= '-'
@@ -154,19 +162,19 @@ class ImageResizeCommand extends AbstractCommand
         $image = $this->imagine->open($this->mediaOptions->getPath() . $this->media->getDirectory() . $this->media->getFilename());
 
         $resizeType = (!empty($this->dimension['mode'])) ? $this->dimension['mode'] : 'crop';
-        switch($resizeType) {
+        switch ($resizeType) {
             case 'crop':
 
                 $imageSize = $image->getSize();
 
                 $imageRatio = $imageSize->getWidth() / $imageSize->getHeight();
 
-                if ($this->dimension['width'] != "auto" && $this->dimension['height'] != "auto") {
+                if ($this->dimension['width'] != 'auto' && $this->dimension['height'] != 'auto') {
                     $dimensionRatio = $this->dimension['width'] / $this->dimension['height'];
 
                     if ($imageRatio < $dimensionRatio) {
                         $boxWidth = $imageSize->getWidth();
-                        $boxHeight = round($imageSize->getWidth()/ $dimensionRatio);
+                        $boxHeight = round($imageSize->getWidth() / $dimensionRatio);
                     } elseif ($imageRatio > $dimensionRatio) {
                         $boxHeight = $imageSize->getHeight();
                         $boxWidth = round($imageSize->getHeight() * $dimensionRatio);
@@ -181,6 +189,7 @@ class ImageResizeCommand extends AbstractCommand
 
                 /** @var ImageCropCommand $imageCropCmd */
                 $imageCropCmd = $this->getCommand(ImageCropCommand::class);
+
                 return $imageCropCmd->setBoxWidth($boxWidth)
                     ->setBoxHeight($boxHeight)
                     ->setDimension($this->dimension)
@@ -188,16 +197,16 @@ class ImageResizeCommand extends AbstractCommand
                     ->setOffsetY(0)
                     ->setMedia($this->media)
                     ->run();
-                
+
                 break;
             case 'resize':
 
                 $width = (($this->dimension['width'] == 'auto') ? PHP_INT_MAX : $this->dimension['width']);
                 $height = (($this->dimension['height'] == 'auto') ? PHP_INT_MAX : $this->dimension['height']);
-                
+
                 $image->thumbnail(new Box($width, $height))->save($fullPath, [
                     'jpeg_quality' => 75,
-                    'png_compression_level' => 7
+                    'png_compression_level' => 7,
                 ]);
                 break;
         }

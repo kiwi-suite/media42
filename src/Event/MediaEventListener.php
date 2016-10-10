@@ -1,4 +1,15 @@
 <?php
+
+/*
+ * media42
+ *
+ * @package media42
+ * @link https://github.com/raum42/media42
+ * @copyright Copyright (c) 2010 - 2016 raum42 (https://www.raum42.at)
+ * @license MIT License
+ * @author raum42 <kiwi@raum42.at>
+ */
+
 namespace Media42\Event;
 
 use Core42\Stdlib\DefaultGetterTrait;
@@ -41,12 +52,11 @@ class MediaEventListener extends AbstractListenerAggregate
         /** @var Media $media */
         $media = $event->getTarget();
 
-        if (substr($media->getMimeType(), 0, 6) != "image/") {
+        if (substr($media->getMimeType(), 0, 6) != 'image/') {
             return;
         }
 
-        foreach ($this->getServiceManager()->get(MediaOptions::class)->getDimensions() as $dimension)
-        {
+        foreach ($this->getServiceManager()->get(MediaOptions::class)->getDimensions() as $dimension) {
             /* @var ImageResizeCommand $cmd */
             $cmd = $this->getCommand(ImageResizeCommand::class);
             $cmd->setMedia($media)
