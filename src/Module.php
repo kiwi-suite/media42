@@ -14,6 +14,7 @@ namespace Media42;
 
 use Admin42\ModuleManager\Feature\AdminAwareModuleInterface;
 use Admin42\ModuleManager\GetAdminConfigTrait;
+use Core42\ModuleManager\Feature\CliConfigProviderInterface;
 use Core42\ModuleManager\GetConfigTrait;
 use Core42\Mvc\Environment\Environment;
 use Media42\Event\MediaEventListener;
@@ -26,6 +27,7 @@ class Module implements
     ConfigProviderInterface,
     BootstrapListenerInterface,
     DependencyIndicatorInterface,
+    CliConfigProviderInterface,
     AdminAwareModuleInterface
 {
     use GetConfigTrait;
@@ -59,5 +61,13 @@ class Module implements
             'Core42',
             'Admin42',
         ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getCliConfig()
+    {
+        return include_once __DIR__ . '/../config/cli/cli.config.php';
     }
 }

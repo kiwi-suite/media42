@@ -6,6 +6,7 @@ use Media42\Command\BulkImportCommand;
 return [
     'cli' => [
         'media-import' => [
+            'group'                     => '*',
             'route'                     => '<dir> [--category=]',
             'command-name'              => BulkImportCommand::class,
             'description'               => 'bulk import media files from a directory',
