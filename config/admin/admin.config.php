@@ -4,13 +4,13 @@ namespace Media42;
 return [
     'admin' => [
         'assets' => [
-            __NAMESPACE__ => [
+            'media42' => [
                 'js' => [
-                    'vendor'    => '/assets/admin/media42/js/vendor.min.js',
-                    'app'       => '/assets/admin/media42/js/media42.min.js',
+                    'vendor'    => '/js/vendor.min.js',
+                    'app'       => '/js/media42.min.js',
                 ],
                 'css' => [
-                    'main'      => '/assets/admin/media42/css/media42.min.css',
+                    'main'      => '/css/media42.min.css',
                 ],
             ],
         ],

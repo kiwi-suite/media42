@@ -42,13 +42,6 @@ return [
         ],
     ],
 
-    'assets' => [
-        __NAMESPACE__ => [
-            'target' => 'public/assets/admin/media42',
-            'source' => 'vendor/fruit42/media42/assets/dist/',
-        ],
-    ],
-
     'migration' => [
         'directory'     => [
             __NAMESPACE__ => __DIR__ . '/../data/migrations'
