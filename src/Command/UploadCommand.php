@@ -14,6 +14,7 @@ namespace Media42\Command;
 
 use Cocur\Slugify\Slugify;
 use Core42\Command\AbstractCommand;
+use Core42\Stdlib\DateTime;
 use Core42\View\Helper\Uuid;
 use Dflydev\ApacheMimeTypes\PhpRepository;
 use Media42\Event\MediaEvent;
@@ -194,7 +195,7 @@ class UploadCommand extends AbstractCommand
         $directory = $this->getTargetDir();
         $destination = $this->mediaOptions->getPath() . $directory . $this->filename;
 
-        $dateTime = new \DateTime();
+        $dateTime = new DateTime();
 
         $this->media->setFilename($this->filename)
             ->setMeta([])

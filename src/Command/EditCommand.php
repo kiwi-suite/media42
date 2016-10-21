@@ -13,6 +13,7 @@
 namespace Media42\Command;
 
 use Cocur\Slugify\Slugify;
+use Core42\Stdlib\DateTime;
 use Dflydev\ApacheMimeTypes\PhpRepository;
 use Media42\Event\MediaEvent;
 use Media42\MediaOptions;
@@ -117,7 +118,7 @@ class EditCommand extends AbstractCommand
         $this->media->setFilename($this->filename);
 
         if ($this->media->hasChanged()) {
-            $this->media->setUpdated(new \DateTime());
+            $this->media->setUpdated(new DateTime());
 
             if ($this->media->hasChanged('filename')) {
                 $this->renameFiles();

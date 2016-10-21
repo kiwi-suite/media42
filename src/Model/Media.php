@@ -13,6 +13,7 @@
 namespace Media42\Model;
 
 use Core42\Model\AbstractModel;
+use Core42\Stdlib\DateTime;
 
 /**
  * @method Media setId() setId(int $id)
@@ -29,10 +30,10 @@ use Core42\Model\AbstractModel;
  * @method int getSize() getSize()
  * @method Media setMeta() setMeta(string $meta)
  * @method string getMeta() getMeta()
- * @method Media setUpdated() setUpdated(\DateTime $updated)
- * @method \DateTime getUpdated() getUpdated()
- * @method Media setCreated() setCreated(\DateTime $created)
- * @method \DateTime getCreated() getCreated()
+ * @method Media setUpdated() setUpdated(DateTime $updated)
+ * @method DateTime getUpdated() getUpdated()
+ * @method Media setCreated() setCreated(DateTime $created)
+ * @method DateTime getCreated() getCreated()
  */
 class Media extends AbstractModel
 {

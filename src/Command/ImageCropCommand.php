@@ -13,6 +13,7 @@
 namespace Media42\Command;
 
 use Core42\Command\AbstractCommand;
+use Core42\Stdlib\DateTime;
 use Imagine\Image\Box;
 use Imagine\Image\ImagineInterface;
 use Imagine\Image\Point;
@@ -252,7 +253,7 @@ class ImageCropCommand extends AbstractCommand
         ];
         $this->media->setMeta($meta);
         if ($this->media->hasChanged()) {
-            $this->media->setUpdated(new \DateTime());
+            $this->media->setUpdated(new DateTime());
         }
         $this->getTableGateway(MediaTableGateway::class)->update($this->media);
 
