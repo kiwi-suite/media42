@@ -31,7 +31,7 @@
                 </div>
 
                 <img ng-show="isImage(formData.value)" ng-src="{{ getSrc(formData.value, 'admin_thumbnail') }}" class="img-full r r-2x">
-                <img ng-show="!isImage(formData.value)" src="<?= $this->assetUrl('assets/admin/admin42/images/document-placeholder.jpg') ?>" class="img-full r r-2x">
+                <img ng-show="!isImage(formData.value)" src="<?= $this->assetUrl('/images/document-placeholder.jpg', 'admin42') ?>" class="img-full r r-2x">
             </div>
         </div>
     </div>

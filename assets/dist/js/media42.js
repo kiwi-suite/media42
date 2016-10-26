@@ -545,8 +545,6 @@ angular.module('media42')
 
                 var mediaConfig = jsonCache.get("mediaConfig");
 
-                directory = directory.replace("data/media", "");
-
                 if (mimeType.substr(0, 6) != "image/" || dimension == null) {
                     return mediaConfig.baseUrl + directory + filename;
                 }
@@ -562,7 +560,12 @@ angular.module('media42')
 
                 filename = filename + "-" + ((currentDimension.width == "auto") ? "" : currentDimension.width) + "x" + ((currentDimension.height == "auto") ? "" : currentDimension.height) + "." + extension;
 
-                return mediaConfig.baseUrl + directory + filename;
+                var baseUrl = "";
+                if (mediaConfig.baseUrl !== null) {
+                    baseUrl = mediaConfig.baseUrl;
+                }
+
+                return baseUrl + directory + filename;
             }
 
             this.getDocumentIcon = function(mimeType) {

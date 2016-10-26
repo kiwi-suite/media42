@@ -64,7 +64,7 @@
 
 <?php if ($this->imageEditing === true): ?>
 <?php
-$jsonDataId = uniqid('crop/') . '.json';
+$jsonDataId = 'media/images/crop/' . $this->uuid()->uuid4() . '.json';
 $this->angular()->addJsonTemplate($jsonDataId, [
     'dimension' => $this->dimensions,
     'meta' => $this->media->getMeta(),

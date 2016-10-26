@@ -198,7 +198,7 @@ $persistKey = md5($this->params('referrer'). $this->params('categorySelection') 
                                     </div>
 
                                     <img ng-if="isImage(row)" ng-src="{{ getSrc(row, 'admin_thumbnail') }}" class="img-full r r-2x">
-                                    <img ng-if="!isImage(row)" src="<?= $this->assetUrl('assets/admin/admin42/images/document-placeholder.jpg') ?>" class="img-full r r-2x">
+                                    <img ng-if="!isImage(row)" src="<?= $this->assetUrl('/images/document-placeholder.jpg', 'admin42') ?>" class="img-full r r-2x">
                                 </div>
                             </div>
                         </div>

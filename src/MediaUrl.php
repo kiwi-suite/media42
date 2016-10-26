@@ -34,18 +34,26 @@ class MediaUrl
     protected $cache;
 
     /**
+     * @var string
+     */
+    protected $basePath;
+
+    /**
      * @param MediaTableGateway $mediaTableGateway
      * @param MediaOptions $mediaOptions
      * @param CacheItemPoolInterface $cache
+     * @param string $basePath
      */
     public function __construct(
         MediaTableGateway $mediaTableGateway,
         MediaOptions $mediaOptions,
-        CacheItemPoolInterface $cache
+        CacheItemPoolInterface $cache,
+        $basePath
     ) {
         $this->mediaTableGateway = $mediaTableGateway;
         $this->mediaOptions = $mediaOptions;
         $this->cache = $cache;
+        $this->basePath = $basePath;
     }
 
     /**
@@ -60,8 +68,17 @@ class MediaUrl
             return '';
         }
 
+        $baseUrl = "";
+        if ($this->mediaOptions->getPrependBasePath() === true) {
+            $baseUrl = $this->basePath;
+        }
+
+        if (strlen($this->mediaOptions->getUrl())) {
+            $baseUrl .= $this->mediaOptions->getUrl();
+        }
+
         if (substr($media->getMimeType(), 0, 6) != 'image/' || $dimension === null) {
-            return $this->mediaOptions->getUrl() . $media->getDirectory() . $media->getFilename();
+            return $baseUrl . $media->getDirectory() . $media->getFilename();
         }
 
         $dimension = $this->mediaOptions->getDimension($dimension);
@@ -80,7 +97,7 @@ class MediaUrl
             . $extension;
 
 
-        return $this->mediaOptions->getUrl() . $media->getDirectory() . rawurlencode($filename);
+        return $baseUrl . $media->getDirectory() . rawurlencode($filename);
     }
 
     /**

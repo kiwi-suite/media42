@@ -42,6 +42,11 @@ class MediaOptions extends AbstractOptions
     protected $uploadHost = '';
 
     /**
+     * @var bool
+     */
+    protected $prependBasePath = true;
+
+    /**
      * @param $path
      */
     public function setPath($path)
@@ -71,6 +76,10 @@ class MediaOptions extends AbstractOptions
      */
     public function setUrl($url)
     {
+        if (!empty($url)) {
+            $url = rtrim($url, '/') . '/';
+        }
+
         $this->url = $url;
 
         return $this;
@@ -174,5 +183,24 @@ class MediaOptions extends AbstractOptions
     public function setUploadHost($uploadHost)
     {
         $this->uploadHost = $uploadHost;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getPrependBasePath()
+    {
+        return $this->prependBasePath;
+    }
+
+    /**
+     * @param boolean $prependBasePath
+     * @return MediaOptions
+     */
+    public function setPrependBasePath($prependBasePath)
+    {
+        $this->prependBasePath = $prependBasePath;
+
+        return $this;
     }
 }

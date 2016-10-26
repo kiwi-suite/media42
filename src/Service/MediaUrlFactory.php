@@ -37,10 +37,17 @@ class MediaUrlFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
+        $basePath = "";
+        $request = $container->get('Request');
+        if (method_exists($request, "getBasePath")) {
+            $basePath = $container->get('Request')->getBasePath();
+        }
+
         return new MediaUrl(
             $container->get('TableGateway')->get(MediaTableGateway::class),
             $container->get(MediaOptions::class),
-            $container->get('Cache')->get('media')
+            $container->get('Cache')->get('media'),
+            $basePath
         );
     }
 }

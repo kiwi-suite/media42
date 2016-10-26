@@ -9,7 +9,8 @@ return [
     'media' => [
         'upload_host' => '',
         'path' => 'data/media/',
-        'url' => '/media/',
+        'prepend_base_path' => true,
+        'url' => null,
 
         'categories' => [
             'default' => 'media.category.default'

@@ -22,8 +22,21 @@ class MediaOptions extends Proxy
         /** @var Angular $angularHelper */
         $angularHelper = $this->getView()->plugin('angular');
 
+        $baseUrl = "";
+        if ($this->getPrependBasePath() === true) {
+            $basePath = $this->getView()->plugin('basePath');
+            $baseUrl = $basePath();
+        }
+
+        if (strlen($this->getUrl())) {
+            $baseUrl .= $this->getUrl();
+        }
+
+        if (empty($baseUrl)) {
+            $baseUrl = null;
+        }
         $angularHelper->addJsonTemplate('mediaConfig', [
-            'baseUrl' => $this->getUrl(),
+            'baseUrl' => $baseUrl,
             'dimensions' => $this->getDimensions(),
         ], false);
     }
