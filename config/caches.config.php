@@ -5,7 +5,7 @@ return [
     'cache' => [
         'caches' => [
             'media' => [
-                'driver' => 'ephemeral',
+                'driver' => (DEVELOPMENT_MODE === true) ? 'development' : 'production',
                 'namespace' => __NAMESPACE__,
             ],
         ],
