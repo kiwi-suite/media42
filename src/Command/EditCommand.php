@@ -163,7 +163,6 @@ class EditCommand extends AbstractCommand
 
         $mediaOptions = $this->getServiceManager()->get(MediaOptions::class);
         $globPath = $mediaOptions->getPath() . $this->media->getDirectory() . $oldFilenameParts['filename'] . '*';
-        var_dump($globPath);
         $entries = Glob::glob($globPath);
         foreach ($entries as $file) {
             $currentFilenameParts = pathinfo($file);
