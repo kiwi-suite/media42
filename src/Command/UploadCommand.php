@@ -20,6 +20,7 @@ use Dflydev\ApacheMimeTypes\PhpRepository;
 use Media42\Event\MediaEvent;
 use Media42\MediaOptions;
 use Media42\Model\Media;
+use Media42\Selector\MediaSelector;
 use Media42\TableGateway\MediaTableGateway;
 use Zend\Stdlib\ErrorHandler;
 
@@ -228,6 +229,12 @@ class UploadCommand extends AbstractCommand
             ->getServiceManager()
             ->get('Media42\EventManager')
             ->trigger(MediaEvent::EVENT_ADD, $this->media);
+
+        $this
+            ->getSelector(MediaSelector::class)
+            ->setDisableCache(true)
+            ->setMediaId($this->media->getId())
+            ->getResult();
 
         return $this->media;
     }

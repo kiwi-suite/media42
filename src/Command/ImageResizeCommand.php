@@ -17,6 +17,7 @@ use Media42\Model\Media;
 use Core42\Command\AbstractCommand;
 use Imagine\Image\Box;
 use Imagine\Image\ImagineInterface;
+use Media42\Selector\MediaSelector;
 use Media42\TableGateway\MediaTableGateway;
 
 class ImageResizeCommand extends AbstractCommand
@@ -210,6 +211,12 @@ class ImageResizeCommand extends AbstractCommand
                 ]);
                 break;
         }
+
+        $this
+            ->getSelector(MediaSelector::class)
+            ->setDisableCache(true)
+            ->setMediaId($media->getId())
+            ->getResult();
 
         return $media;
     }

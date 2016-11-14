@@ -19,6 +19,7 @@ use Media42\Event\MediaEvent;
 use Media42\MediaOptions;
 use Media42\Model\Media;
 use Core42\Command\AbstractCommand;
+use Media42\Selector\MediaSelector;
 use Media42\TableGateway\MediaTableGateway;
 use Zend\Stdlib\Glob;
 
@@ -131,7 +132,11 @@ class EditCommand extends AbstractCommand
                 ->get('Media42\EventManager')
                 ->trigger(MediaEvent::EVENT_EDIT, $this->media);
 
-            $this->getCache('media')->deleteItem($this->media->getId());
+            $this
+                ->getSelector(MediaSelector::class)
+                ->setDisableCache(true)
+                ->setMediaId($this->media->getId())
+                ->getResult();
         }
 
 

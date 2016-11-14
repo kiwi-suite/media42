@@ -16,6 +16,7 @@ use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use Media42\MediaOptions;
 use Media42\MediaUrl;
+use Media42\Selector\MediaSelector;
 use Media42\TableGateway\MediaTableGateway;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
@@ -46,7 +47,7 @@ class MediaUrlFactory implements FactoryInterface
         return new MediaUrl(
             $container->get('TableGateway')->get(MediaTableGateway::class),
             $container->get(MediaOptions::class),
-            $container->get('Cache')->get('media'),
+            $container->get('Selector')->get(MediaSelector::class),
             $basePath
         );
     }

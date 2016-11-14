@@ -20,6 +20,7 @@ use Imagine\Image\Point;
 use Media42\Event\MediaEvent;
 use Media42\MediaOptions;
 use Media42\Model\Media;
+use Media42\Selector\MediaSelector;
 use Media42\TableGateway\MediaTableGateway;
 
 class ImageCropCommand extends AbstractCommand
@@ -261,6 +262,12 @@ class ImageCropCommand extends AbstractCommand
             ->getServiceManager()
             ->get('Media42\EventManager')
             ->trigger(MediaEvent::EVENT_CROP, $media);
+
+        $this
+            ->getSelector(MediaSelector::class)
+            ->setDisableCache(true)
+            ->setMediaId($this->media->getId())
+            ->getResult();
 
         return $media;
     }

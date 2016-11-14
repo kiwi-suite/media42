@@ -13,6 +13,7 @@
 namespace Media42;
 
 use Media42\Model\Media;
+use Media42\Selector\MediaSelector;
 use Media42\TableGateway\MediaTableGateway;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -29,9 +30,9 @@ class MediaUrl
     protected $mediaOptions;
 
     /**
-     * @var CacheItemPoolInterface
+     * @var MediaSelector
      */
-    protected $cache;
+    protected $mediaSelector;
 
     /**
      * @var string
@@ -41,18 +42,18 @@ class MediaUrl
     /**
      * @param MediaTableGateway $mediaTableGateway
      * @param MediaOptions $mediaOptions
-     * @param CacheItemPoolInterface $cache
+     * @param MediaSelector $mediaSelector
      * @param string $basePath
      */
     public function __construct(
         MediaTableGateway $mediaTableGateway,
         MediaOptions $mediaOptions,
-        CacheItemPoolInterface $cache,
+        MediaSelector $mediaSelector,
         $basePath
     ) {
         $this->mediaTableGateway = $mediaTableGateway;
         $this->mediaOptions = $mediaOptions;
-        $this->cache = $cache;
+        $this->mediaSelector = $mediaSelector;
         $this->basePath = $basePath;
     }
 
@@ -63,7 +64,7 @@ class MediaUrl
      */
     public function getUrl($mediaId, $dimension = null)
     {
-        $media = $this->loadMedia($mediaId);
+        $media = $this->mediaSelector->setMediaId($mediaId)->getResult();
         if (empty($media)) {
             return '';
         }
@@ -98,28 +99,5 @@ class MediaUrl
 
 
         return $baseUrl . $media->getDirectory() . rawurlencode($filename);
-    }
-
-    /**
-     * @param $mediaId
-     * @return Media|null
-     * @throws \Exception
-     */
-    public function loadMedia($mediaId)
-    {
-        if (empty($mediaId)) {
-            return;
-        }
-        $item = $this->cache->getItem($mediaId);
-
-        $media = $item->get();
-
-        if (!$item->isHit()) {
-            $media = $this->mediaTableGateway->selectByPrimary((int) $mediaId);
-            $item->set($media);
-            $this->cache->save($item);
-        }
-
-        return $media;
     }
 }
