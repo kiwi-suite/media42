@@ -14,6 +14,7 @@ namespace Media42\View\Helper\Service;
 
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
+use Media42\Selector\MediaSelector;
 use Media42\TableGateway\MediaTableGateway;
 use Media42\View\Helper\Media;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
@@ -37,8 +38,8 @@ class MediaFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $mediaTableGateway = $container->get('TableGateway')->get(MediaTableGateway::class);
-        $cache = $container->get('Cache')->get('media');
+        $selector = $container->get('Selector')->get(MediaSelector::class);
 
-        return new Media($mediaTableGateway, $cache);
+        return new Media($mediaTableGateway, $selector);
     }
 }
