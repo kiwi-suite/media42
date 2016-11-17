@@ -20,9 +20,9 @@ return [
             'adapter' => 'imagick',
             'dimensions' => [
                 'admin_thumbnail' => [
+                    'name'         => 'admin_thumbnail',
+                    'label'        => 'Admin Thumbnail',
                     'system'       => true,
-                    'pre_generate' => true,
-                    'mode'         => '',
                     'width'        => 300,
                     'height'       => 300
                 ],

@@ -246,7 +246,12 @@ class ImageCropCommand extends AbstractCommand
         if (empty($meta)) {
             $media = [];
         }
-        $meta[$this->dimensionName] = [
+
+        if (empty($meta['crop'])) {
+            $meta['crop'] = [];
+        }
+
+        $meta['crop'][$this->dimension['name']] = [
             'x' => $this->offsetX,
             'y' => $this->offsetY,
             'width' => $this->boxWidth,
@@ -262,12 +267,6 @@ class ImageCropCommand extends AbstractCommand
             ->getServiceManager()
             ->get('Media42\EventManager')
             ->trigger(MediaEvent::EVENT_CROP, $media);
-
-        $this
-            ->getSelector(MediaSelector::class)
-            ->setDisableCache(true)
-            ->setMediaId($this->media->getId())
-            ->getResult();
 
         return $media;
     }

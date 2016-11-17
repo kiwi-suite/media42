@@ -212,12 +212,6 @@ class ImageResizeCommand extends AbstractCommand
                 break;
         }
 
-        $this
-            ->getSelector(MediaSelector::class)
-            ->setDisableCache(true)
-            ->setMediaId($media->getId())
-            ->getResult();
-
         return $media;
     }
 }

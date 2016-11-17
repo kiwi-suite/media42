@@ -230,12 +230,6 @@ class UploadCommand extends AbstractCommand
             ->get('Media42\EventManager')
             ->trigger(MediaEvent::EVENT_ADD, $this->media);
 
-        $this
-            ->getSelector(MediaSelector::class)
-            ->setDisableCache(true)
-            ->setMediaId($this->media->getId())
-            ->getResult();
-
         return $this->media;
     }
 

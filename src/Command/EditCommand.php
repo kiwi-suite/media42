@@ -131,12 +131,6 @@ class EditCommand extends AbstractCommand
                 ->getServiceManager()
                 ->get('Media42\EventManager')
                 ->trigger(MediaEvent::EVENT_EDIT, $this->media);
-
-            $this
-                ->getSelector(MediaSelector::class)
-                ->setDisableCache(true)
-                ->setMediaId($this->media->getId())
-                ->getResult();
         }
 
 

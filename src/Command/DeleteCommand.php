@@ -80,7 +80,5 @@ class DeleteCommand extends AbstractCommand
             ->getServiceManager()
             ->get('Media42\EventManager')
             ->trigger(MediaEvent::EVENT_DELETE, $this->media);
-
-        $this->getCache('media')->deleteItem($this->media->getId());
     }
 }

@@ -14,8 +14,10 @@ namespace Media42\Event;
 
 use Core42\Stdlib\DefaultGetterTrait;
 use Media42\Command\ImageResizeCommand;
+use Media42\Command\ImageSizeCommand;
 use Media42\MediaOptions;
 use Media42\Model\Media;
+use Media42\Selector\MediaSelector;
 use Zend\EventManager\AbstractListenerAggregate;
 use Zend\EventManager\EventManagerInterface;
 use Zend\ServiceManager\ServiceManager;
@@ -41,7 +43,28 @@ class MediaEventListener extends AbstractListenerAggregate
      */
     public function attach(EventManagerInterface $events, $priority = 1)
     {
+        $events->attach(MediaEvent::EVENT_ADD, [$this, 'setImageSize']);
         $events->attach(MediaEvent::EVENT_ADD, [$this, 'resizeImages']);
+        $events->attach(MediaEvent::EVENT_ADD, [$this, 'setCache']);
+        $events->attach(MediaEvent::EVENT_EDIT, [$this, 'setCache']);
+        $events->attach(MediaEvent::EVENT_DELETE, [$this, 'removeCache']);
+    }
+
+    /**
+     * @param MediaEvent $event
+     */
+    public function setImageSize(MediaEvent $event)
+    {
+        /** @var Media $media */
+        $media = $event->getTarget();
+
+        if (substr($media->getMimeType(), 0, 6) != 'image/') {
+            return;
+        }
+
+        $cmd = $this->getCommand(ImageSizeCommand::class);
+        $cmd->setMedia($media)
+            ->run();
     }
 
     /**
@@ -63,5 +86,25 @@ class MediaEventListener extends AbstractListenerAggregate
                 ->setDimension($dimension)
                 ->run();
         }
+    }
+
+    /**
+     * @param MediaEvent $event
+     */
+    public function setCache(MediaEvent $event)
+    {
+        $this
+            ->getSelector(MediaSelector::class)
+            ->setDisableCache(true)
+            ->setMediaId($event->getTarget()->getId())
+            ->getResult();
+    }
+
+    /**
+     * @param MediaEvent $event
+     */
+    public function removeCache(MediaEvent $event)
+    {
+        $this->getCache('media')->deleteItem($event->getTarget()->getId());
     }
 }
