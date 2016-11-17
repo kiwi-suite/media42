@@ -100,7 +100,7 @@ angular.module('media42')
         $scope.data = [];
 
         $scope.dimensions = jsonCache.get($attrs.json)['dimension'];
-        $scope.meta = jsonCache.get($attrs.json)['meta'];
+        $scope.meta = jsonCache.get($attrs.json)['meta']['crop'];
         $scope.selectedHandle = null;
 
         var imageSize = jsonCache.get($attrs.json)['imageSize'];
@@ -169,7 +169,9 @@ angular.module('media42')
 
             url = url.replace('{{ name }}', handle);
 
-            $http.post(url, $scope.data[handle]);
+            $http.post(url, $scope.data[handle]).success(function(){
+                $scope.hasChanges[handle] = false;
+            });
         };
 
         function setCurrentInfo(currentInfo) {
@@ -214,7 +216,6 @@ angular.module('media42')
 
             var options = {
                 crop: function(dataNew) {
-                    console.log(dataNew);
                     $scope.data[$scope.selectedHandle] = {
                         'x': dataNew.x,
                         'y': dataNew.y,
@@ -545,12 +546,17 @@ angular.module('media42')
 
                 var mediaConfig = jsonCache.get("mediaConfig");
 
+                var baseUrl = "";
+                if (mediaConfig.baseUrl !== null) {
+                    baseUrl = mediaConfig.baseUrl;
+                }
+
                 if (mimeType.substr(0, 6) != "image/" || dimension == null) {
-                    return mediaConfig.baseUrl + directory + filename;
+                    return baseUrl + directory + filename;
                 }
 
                 if (angular.isUndefined(mediaConfig.dimensions[dimension])) {
-                    return mediaConfig.baseUrl + directory + filename;
+                    return baseUrl + directory + filename;
                 }
 
                 var currentDimension = mediaConfig.dimensions[dimension];
@@ -559,11 +565,6 @@ angular.module('media42')
                 filename = filename.substr(0, filename.length - extension.length -1);
 
                 filename = filename + "-" + ((currentDimension.width == "auto") ? "" : currentDimension.width) + "x" + ((currentDimension.height == "auto") ? "" : currentDimension.height) + "." + extension;
-
-                var baseUrl = "";
-                if (mediaConfig.baseUrl !== null) {
-                    baseUrl = mediaConfig.baseUrl;
-                }
 
                 return baseUrl + directory + filename;
             }

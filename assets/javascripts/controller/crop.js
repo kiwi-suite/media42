@@ -3,7 +3,7 @@ angular.module('media42')
         $scope.data = [];
 
         $scope.dimensions = jsonCache.get($attrs.json)['dimension'];
-        $scope.meta = jsonCache.get($attrs.json)['meta'];
+        $scope.meta = jsonCache.get($attrs.json)['meta']['crop'];
         $scope.selectedHandle = null;
 
         var imageSize = jsonCache.get($attrs.json)['imageSize'];
@@ -72,7 +72,9 @@ angular.module('media42')
 
             url = url.replace('{{ name }}', handle);
 
-            $http.post(url, $scope.data[handle]);
+            $http.post(url, $scope.data[handle]).success(function(){
+                $scope.hasChanges[handle] = false;
+            });
         };
 
         function setCurrentInfo(currentInfo) {
@@ -117,7 +119,6 @@ angular.module('media42')
 
             var options = {
                 crop: function(dataNew) {
-                    console.log(dataNew);
                     $scope.data[$scope.selectedHandle] = {
                         'x': dataNew.x,
                         'y': dataNew.y,
