@@ -67,6 +67,42 @@ class Media
     }
 
     /**
+     * @param null $dimension
+     * @return array|void
+     */
+    public function getImageSize($dimension = null)
+    {
+        if (substr($this->getMimeType(), 0, 6) != 'image/') {
+            return;
+        }
+
+        $meta = $this->getMeta();
+
+        if ($dimension === null) {
+            if (empty($meta['original'])) {
+                return [
+                    'width' => 0,
+                    'height' => 0,
+                ];
+            }
+
+            return $meta['original'];
+        }
+
+        if (empty($meta['crop'][$dimension])) {
+            return [
+                'width' => 0,
+                'height' => 0,
+            ];
+        }
+
+        return [
+            'width' => $meta['crop'][$dimension]['resizeWidth'],
+            'height' => $meta['crop'][$dimension]['resizeHeight'],
+        ];
+    }
+
+    /**
      * @return string
      */
     public function __toString()

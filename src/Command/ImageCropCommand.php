@@ -241,6 +241,8 @@ class ImageCropCommand extends AbstractCommand
         $media->setMimeType(finfo_file($finfo, $fullPath));
         $media->setSize(filesize($fullPath));
 
+        $resizedImage = $this->imagine->open($fullPath);
+
 
         $meta = $this->media->getMeta();
         if (empty($meta)) {
@@ -256,6 +258,8 @@ class ImageCropCommand extends AbstractCommand
             'y' => $this->offsetY,
             'width' => $this->boxWidth,
             'height' => $this->boxHeight,
+            'resizeWidth' => $resizedImage->getSize()->getWidth(),
+            'resizeHeight' => $resizedImage->getSize()->getHeight(),
         ];
         $this->media->setMeta($meta);
         if ($this->media->hasChanged()) {
