@@ -118,7 +118,7 @@ $this->angular()->addJsonTemplate($jsonDataId, [
                                 <div class="media-body">
                                     <div class="row">
                                         <div class="col-md-10 col-md-offset-2">
-                                            {{ data.name }}<br/>
+                                            <span class="text-black">{{ data.label }}</span><br/>
                                             <small class="text-muted">({{data.width}} x {{data.height}})</small>
                                             <div class="text-warning">
                                                 <span class="fa fa-warning"></span> <?= $this->translate('media.warning.image-too-small', 'admin') ?>
@@ -137,15 +137,15 @@ $this->angular()->addJsonTemplate($jsonDataId, [
                                             </a>
                                         </div>
                                         <div class="col-md-6">
-                                            {{ data.name }}<br/>
+                                            <span class="text-black">{{ data.label }}</span><br/>
                                             <small class="text-muted">({{data.width}} x {{data.height}})</small>
                                         </div>
                                         <div class="col-md-4 text-right">
                                             <button
                                                 ng-if="hasChanges[name] && checkImageSize(data)"
-                                                class="btn btn-primary btn-sm"
+                                                class="btn btn-primary btn-sm btn-addon"
                                                 ng-click="saveCroppedImage(name, '<?= $this->url('admin/media/crop', ['id' => $this->media->getId(), 'dimension' => '{{ name }}'])?>')">
-                                                <span class="fa fa-save"></span>
+                                                <i class="fa fa-save"></i>
                                                 <?= $this->translate('button.save', 'admin') ?>
                                             </button>
                                         </div>
