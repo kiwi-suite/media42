@@ -40,7 +40,7 @@ class Media extends AbstractModel
     /**
      * @var array
      */
-    public $properties = [
+    protected $properties = [
         'id',
         'directory',
         'filename',
