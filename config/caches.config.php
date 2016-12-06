@@ -1,12 +1,12 @@
 <?php
+namespace Media42;
+
 return [
-    'caches' => [
-        'Cache\Media' => [
-            'adapter' => [
-                'name' => 'memory',
-            ],
-            'plugins' => [
-                'Serializer'
+    'cache' => [
+        'caches' => [
+            'media' => [
+                'driver' => (DEVELOPMENT_MODE === true) ? 'development' : 'production',
+                'namespace' => __NAMESPACE__,
             ],
         ],
     ],

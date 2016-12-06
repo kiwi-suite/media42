@@ -1,18 +1,31 @@
 {
     "name": "fruit42/media42",
-    "type": "zend-module",
+    "description": "media42",
+    "license": "MIT",
+    "type": "project",
+    "keywords": [
+        "fruit42",
+        "kiwi42",
+        "cms"
+    ],
     "require": {
-        "php": ">=5.5",
-        "ext-intl" : "*",
-        "composer/installers": "~1.0",
-        "fruit42/core42": "^2.0.0",
-        "imagine/imagine": "~0.6.2"
+        "php": "^5.6 || ^7.0",
+        "ext-fileinfo": "*",
+        "fruit42/core42": "^4.0",
+        "fruit42/admin42": "^4.0",
+        "imagine/imagine": "0.6.3"
     },
     "require-dev": {
+        "zendframework/zend-test": "^3.0"
     },
     "autoload": {
         "psr-4": {
-            "Media42\\": "src/Media42/"
+            "Media42\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Media42Test\\": "src/"
         }
     }
 }

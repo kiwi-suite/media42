@@ -1,0 +1,159 @@
+angular.module('media42')
+    .controller('MediaController', ['$scope', 'FileUploader', '$attrs', '$http', '$sessionStorage', '$templateCache', 'MediaService', '$uibModal', function ($scope, FileUploader, $attrs, $http, $sessionStorage, $templateCache, MediaService, $uibModal) {
+        $templateCache.put('template/smart-table/pagination.html',
+            '<nav ng-if="numPages && pages.length >= 2"><ul class="pagination">' +
+            '<li ng-if="currentPage > 1"><a ng-click="selectPage(1)"><i class="fa fa-angle-double-left"></i></a></li>' +
+            '<li ng-if="currentPage > 1"><a ng-click="selectPage(currentPage - 1)"><i class="fa fa-angle-left"></i></a></li>' +
+            '<li ng-repeat="page in pages" ng-class="{active: page==currentPage}"><a ng-click="selectPage(page)">{{page}}</a></li>' +
+            '<li ng-if="currentPage < numPages"><a ng-click="selectPage(currentPage + 1)"><i class="fa fa-angle-right"></i></a></li>' +
+            '<li ng-if="currentPage < numPages"><a ng-click="selectPage(numPages)"><i class="fa fa-angle-double-right"></i></a></li>' +
+            '</ul></nav>');
+
+        var currentTableState = {};
+        var url = $attrs.url;
+
+        var persistNamespace = null;
+        if (angular.isDefined($attrs.persist) && $attrs.persist.length > 0) {
+            persistNamespace = $attrs.persist;
+        }
+
+        var isInitialCall = true;
+
+        $scope.isCollapsed = true;
+        $scope.collection = [];
+        $scope.isLoading = true;
+        $scope.displayedPages = 1;
+
+        $scope.errorFiles = [];
+
+        $scope.category = $attrs.category;
+
+        var categorySelectElement = angular.element('#media-category-select');
+
+        var uploader = $scope.uploader = new FileUploader({
+            url: $attrs.uploadUrl,
+            filters: [{
+                name: 'filesize',
+                fn: function(item) {
+                    if (item.size > $attrs.maxFileSize) {
+                        $scope.errorFiles.push(item);
+
+                        return false;
+                    }
+
+                    return true;
+                }
+            }]
+        });
+
+        $scope.$watch('category',function(newValue, oldValue) {
+            if(newValue != oldValue && categorySelectElement.val() != newValue) {
+                categorySelectElement.val(newValue).trigger('change');
+            }
+        },true);
+
+        $scope.delete = function(deleteUrl, id, modalTitle, modalContent) {
+            $scope.deleteLoading = true;
+            var modalInstance = $uibModal.open({
+                animation: true,
+                templateUrl: 'element/delete-modal.html',
+                controller: 'DeleteModalController',
+                resolve: {
+                    requestUrl: function(){
+                        return deleteUrl;
+                    },
+                    requestParams: function(){
+                        return {id: id};
+                    },
+                    requestTitle: function(){
+                        return modalTitle;
+                    },
+                    requestContent: function(){
+                        return modalContent;
+                    },
+                    requestMethod: function(){
+                        return "delete";
+                    },
+                    requestIcon: function(){
+                        return "fa fa-trash-o";
+                    }
+                }
+            });
+
+            modalInstance.result.then(function (data) {
+                requestFromServer(url, currentTableState);
+
+
+                $scope.deleteLoading = false;
+            }, function () {
+                $scope.deleteLoading = false;
+            });
+        }
+
+        uploader.onBeforeUploadItem = function onBeforeUploadItem(item) {
+            item.formData = [{
+                category: $scope.category
+            }];
+        }
+
+
+        uploader.onCompleteAll = function() {
+
+            requestFromServer(url, currentTableState);
+            $scope.errorFiles = [];
+        };
+
+        $scope.isImage = function(item) {
+            return MediaService.isImage(item.mimeType);
+        };
+
+        $scope.getDocumentClass = function(item) {
+            return MediaService.getDocumentIcon(item.mimeType);
+        };
+
+        $scope.callServer = function (tableState) {
+            currentTableState = tableState;
+
+            if (isInitialCall === true && persistNamespace !== null) {
+                if (angular.isDefined($sessionStorage.smartTable) && angular.isDefined($sessionStorage.smartTable[persistNamespace])) {
+                    angular.extend(tableState, angular.fromJson($sessionStorage.smartTable[persistNamespace]));
+                }
+            } else if (persistNamespace !== null) {
+                if (angular.isUndefined($sessionStorage.smartTable)) {
+                    $sessionStorage.smartTable = {};
+                }
+                $sessionStorage.smartTable[persistNamespace] = angular.toJson(tableState);
+            }
+
+            if (angular.isDefined(tableState['search']) && angular.isDefined(tableState['search']['predicateObject']) && angular.isDefined(tableState['search']['predicateObject']['categorySelection'])) {
+                var categorySelection = tableState['search']['predicateObject']['categorySelection'];
+
+                if (categorySelection != '*' && categorySelection != $scope.category) {
+                    $scope.category = categorySelection;
+                }
+            }
+            requestFromServer(url, tableState);
+        };
+
+        $scope.getSrc = function(media, dimension) {
+            return MediaService.getMediaUrl(media.directory, media.filename, media.mimeType, dimension);
+        };
+
+        function requestFromServer(url, tableState) {
+            $scope.collection = [];
+            $scope.isLoading = true;
+
+            isInitialCall = false;
+            $http.post(url, tableState).
+            success(function(data, status, headers, config) {
+                $scope.isLoading = false;
+
+                $scope.collection = data.data;
+
+                $scope.displayedPages = data.meta.displayedPages;
+                tableState.pagination.numberOfPages = data.meta.displayedPages;
+            }).
+            error(function(data, status, headers, config) {
+            });
+        }
+    }]);

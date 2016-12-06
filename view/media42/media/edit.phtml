@@ -5,39 +5,69 @@
     </h1>
 </div>
 <div class="wrapper-md">
-    <form class="form-horizontal" role="form" action="<?= $this->url(null, array(), array(), true) ?>" method="post">
-        <div class="panel b-a">
-            <div class="panel-body">
-                <?= $this->form($this->editForm)?>
-            </div>
-            <div class="panel-footer">
-                <div class="form-group">
-                    <div class="col-sm-offset-2 col-md-10">
-                        <button type="submit" class="btn btn-primary">
-                            <span class="fa fa-save"></span>
-                            <?= $this->translate('button.save', 'admin') ?>
-                        </button>
+    <div class="row">
+        <div class="col-sm-12 col-md-8">
+            <form class="form-horizontal" role="form" action="<?= $this->url(null, [], [], true) ?>" method="post">
+                <div class="panel b-a">
+                    <div class="panel-body">
+                        <?= $this->form($this->editForm)?>
+                    </div>
+                    <div class="panel-footer">
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-md-10">
+                                <submit submit-text="<?= $this->translate('button.save', 'admin') ?>"></submit>
 
-                        <delete
-                            url="<?= $this->url('admin/media/delete') ?>"
-                            title="<?= $this->translate("media.modal.delete.title", "admin") ?>"
-                            content="<?= $this->translate("media.modal.delete.content", "admin") ?>"
-                            request-id="<?= $this->params()->fromRoute("id") ?>"
-                            >
-                        </delete>
+                                <delete
+                                    url="<?= $this->url('admin/media/delete') ?>"
+                                    title="<?= $this->translate("media.modal.delete.title", "admin") ?>"
+                                    content="<?= $this->translate("media.modal.delete.content", "admin") ?>"
+                                    request-id="<?= $this->params()->fromRoute("id") ?>"
+                                >
+                                </delete>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
-    </form>
+        <div class="col-sm-12 col-md-4" ng-controller="ReplaceUploaderController" data-upload-url="<?= $this->uploadHost . $this->url('admin/media/upload', ['id' => $this->params()->fromRoute('id')], [], true) ?>" data-max-file-size="<?= $this->maxFileSize ?>">
+            <div class="alert alert-danger" ng-show="errorFiles.length != 0">
+                <strong><?= $this->translate('media.error.filesize', 'admin') ?> {{ '<?= $this->maxFileSize ?>' | bytes }}</strong>
+                <div ng-repeat="item in errorFiles">
+                    <span>{{item.name}} ( {{item.size | bytes }} )</span>
+                </div>
+            </div>
+            <form class="form-horizontal" role="form" action="<?= $this->url('admin/media/upload', ['id' => $this->params()->fromRoute('id')], [], true) ?>" method="post">
+                <div class="panel b-a">
+                    <div class="panel-body">
+                        <div ng-show="uploader.queue.length == 0">
+                            <div class="m-b-md">
+                                <div class="b-a b-2x b-dashed wrapper-lg bg-white text-center m-b" nv-file-drop uploader="uploader">
+                                    <?= $this->translate('media.info-dropzone', 'admin')?>
+                                </div>
+                            </div>
+                            <input type="file" nv-file-select="" uploader="uploader"/>
+                            <div class="text-xs m-l-xs"><?= $this->translate('media.maxfilesize', 'admin'); ?> {{ '<?= $this->maxFileSize ?>' | bytes }}</div>
+                        </div>
+                        <div ng-show="uploader.queue.length > 0" class="m-t-xs">
+                            <h2><?= $this->translate('field.progress', 'admin')?></h2>
+                            <div class="progress progress-sm m-b-none m-t-xs" ng-repeat="item in uploader.queue">
+                                <div class="progress-bar bg-info" role="progressbar" ng-style="{ 'width': item.progress + '%' }"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
-<?php if (substr($this->media->getMimeType(), 0, 6) == "image/"): ?>
+<?php if ($this->imageEditing === true): ?>
 <?php
-$jsonDataId = uniqid('crop/') . '.json';
-$this->admin()->addJsonTemplate($jsonDataId, [
+$jsonDataId = 'media/images/crop/' . $this->uuid()->uuid4() . '.json';
+$this->angular()->addJsonTemplate($jsonDataId, [
     'dimension' => $this->dimensions,
-    'meta' => \Zend\Json\Json::decode($this->media->getMeta()),
+    'meta' => $this->media->getMeta(),
     'imageSize' => $this->imageSize
 ]);
 ?>
@@ -88,10 +118,10 @@ $this->admin()->addJsonTemplate($jsonDataId, [
                                 <div class="media-body">
                                     <div class="row">
                                         <div class="col-md-10 col-md-offset-2">
-                                            {{ data.name }}<br/>
+                                            <span class="text-black">{{ data.label }}</span><br/>
                                             <small class="text-muted">({{data.width}} x {{data.height}})</small>
                                             <div class="text-warning">
-                                                <span class="fa fa-warning"></span> <?= $this->translate('media.warning.image-too-small') ?>
+                                                <span class="fa fa-warning"></span> <?= $this->translate('media.warning.image-too-small', 'admin') ?>
                                             </div>
                                         </div>
                                     </div>
@@ -107,15 +137,15 @@ $this->admin()->addJsonTemplate($jsonDataId, [
                                             </a>
                                         </div>
                                         <div class="col-md-6">
-                                            {{ data.name }}<br/>
+                                            <span class="text-black">{{ data.label }}</span><br/>
                                             <small class="text-muted">({{data.width}} x {{data.height}})</small>
                                         </div>
                                         <div class="col-md-4 text-right">
                                             <button
                                                 ng-if="hasChanges[name] && checkImageSize(data)"
-                                                class="btn btn-success btn-sm"
+                                                class="btn btn-primary btn-sm btn-addon"
                                                 ng-click="saveCroppedImage(name, '<?= $this->url('admin/media/crop', ['id' => $this->media->getId(), 'dimension' => '{{ name }}'])?>')">
-                                                <span class="fa fa-save"></span>
+                                                <i class="fa fa-save"></i>
                                                 <?= $this->translate('button.save', 'admin') ?>
                                             </button>
                                         </div>

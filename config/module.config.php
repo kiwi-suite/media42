@@ -1,18 +1,16 @@
 <?php
 namespace Media42;
 
-use Media42\MediaEvent;
-use Media42\MediaUrl;
-use Media42\Service\EventManagerFactory;
-use Media42\Service\MediaOptionsFactory;
-use Media42\Service\MediaUrlFactory;
+use Media42\View\Helper\Service\MediaFactory;
+use Media42\View\Helper\Service\MediaUrlFactory;
 
 return [
 
     'media' => [
         'upload_host' => '',
         'path' => 'data/media/',
-        'url' => '/media/',
+        'prepend_base_path' => true,
+        'url' => null,
 
         'categories' => [
             'default' => 'media.category.default'
@@ -22,32 +20,13 @@ return [
             'adapter' => 'imagick',
             'dimensions' => [
                 'admin_thumbnail' => [
+                    'name'         => 'admin_thumbnail',
+                    'label'        => 'Admin Thumbnail',
                     'system'       => true,
-                    'pre_generate' => true,
-                    'mode'         => '',
                     'width'        => 300,
                     'height'       => 300
                 ],
             ]
-        ],
-    ],
-
-    'service_manager' => [
-        'factories' => [
-            'Imagine' => 'Admin42\Imagine\Service\ImagineFactory',
-
-             MediaOptions::class   => MediaOptionsFactory::class,
-             MediaUrl::class       => MediaUrlFactory::class,
-
-            'Media42\EventManager' => EventManagerFactory::class,
-
-            \Media42\Link\Adapter\MediaLink::class => \Media42\Link\Adapter\Service\MediaLinkFactory::class,
-        ],
-    ],
-
-    'link' => [
-        'adapter' => [
-            'media'  => 'Admin42\Link\MediaLink',
         ],
     ],
 
@@ -59,8 +38,8 @@ return [
 
     'view_helpers' => [
         'factories' => [
-            'media'            => \Media42\View\Helper\Service\MediaFactory::class,
-            'mediaUrl'         => \Media42\View\Helper\Service\MediaUrlFactory::class,
+            'media'             => MediaFactory::class,
+            'mediaUrl'          => MediaUrlFactory::class,
         ],
     ],
 
