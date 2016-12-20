@@ -90,10 +90,14 @@ class Media
         }
 
         if (empty($meta['crop'][$dimension])) {
-            return [
-                'width' => 0,
-                'height' => 0,
-            ];
+            if (empty($meta['original'])) {
+                return [
+                    'width' => 0,
+                    'height' => 0,
+                ];
+            }
+
+            return $meta['original'];
         }
 
         return [
