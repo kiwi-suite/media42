@@ -24,7 +24,7 @@ return [
                             ],
                             'constraints' => [
                                 'referrer' => '(index|modal)',
-                                'typeSelection' => '(\*|pdf|images)',
+                                'typeSelection' => '(\*|\%2A|pdf|images)',
                             ],
                         ],
                         'may_terminate' => true,
