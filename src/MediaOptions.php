@@ -47,6 +47,11 @@ class MediaOptions extends AbstractOptions
     protected $prependBasePath = true;
 
     /**
+     * @var array
+     */
+    protected $allowedMimeTypes = null;
+
+    /**
      * @param $path
      */
     public function setPath($path)
@@ -201,6 +206,24 @@ class MediaOptions extends AbstractOptions
     {
         $this->prependBasePath = $prependBasePath;
 
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllowedMimeTypes()
+    {
+        return $this->allowedMimeTypes;
+    }
+
+    /**
+     * @param array $allowedMimeTypes
+     * @return MediaOptions
+     */
+    public function setAllowedMimeTypes($allowedMimeTypes)
+    {
+        $this->allowedMimeTypes = $allowedMimeTypes;
         return $this;
     }
 }

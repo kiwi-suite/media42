@@ -16,6 +16,8 @@ return [
             'default' => 'media.category.default'
         ],
 
+        'allowed_mime_types' => null,
+
         'images' => [
             'adapter' => 'imagick',
             'dimensions' => [

@@ -175,6 +175,8 @@ class MediaController extends AbstractAdminController
                     ->enableAutomaticFormFill(false)
                     ->run();
                 $jsonModel->answer = 'File transfer completed';
+            } else {
+                $this->getResponse()->setStatusCode(Response::STATUS_CODE_403);
             }
         }
 
