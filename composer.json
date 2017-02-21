@@ -15,9 +15,6 @@
         "fruit42/admin42": "^4.0",
         "imagine/imagine": "0.6.3"
     },
-    "require-dev": {
-        "zendframework/zend-test": "^3.0"
-    },
     "autoload": {
         "psr-4": {
             "Media42\\": "src/"
