@@ -15,13 +15,12 @@ namespace Media42\Command;
 use Cocur\Slugify\Slugify;
 use Core42\Command\AbstractCommand;
 use Core42\Stdlib\DateTime;
-use Core42\View\Helper\Uuid;
 use Dflydev\ApacheMimeTypes\PhpRepository;
 use Media42\Event\MediaEvent;
 use Media42\MediaOptions;
 use Media42\Model\Media;
-use Media42\Selector\MediaSelector;
 use Media42\TableGateway\MediaTableGateway;
+use Ramsey\Uuid\Uuid;
 use Zend\Stdlib\ErrorHandler;
 
 class UploadCommand extends AbstractCommand
@@ -264,7 +263,7 @@ class UploadCommand extends AbstractCommand
     protected function getTargetDir()
     {
         do {
-            $targetDir = implode('/', str_split(substr(md5(Uuid::uuid4()), 0, 8), 2)) . '/';
+            $targetDir = implode('/', str_split(substr(md5(Uuid::uuid4()->toString()), 0, 8), 2)) . '/';
 
             //ad blocker will block the image when "ad" is part of the path
         } while (is_dir($this->mediaOptions->getPath() . $targetDir) || strpos($targetDir, 'ad') !== false);
