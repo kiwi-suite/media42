@@ -14,6 +14,7 @@ namespace Media42\Link\Adapter;
 
 use Admin42\Link\Adapter\AdapterInterface;
 use Media42\MediaOptions;
+use Media42\MediaUrl;
 use Media42\Model\Media;
 use Media42\TableGateway\MediaTableGateway;
 
@@ -28,15 +29,20 @@ class MediaLink implements AdapterInterface
      * @var MediaOptions
      */
     protected $mediaOptions;
+    /**
+     * @var MediaUrl
+     */
+    private $mediaUrl;
 
     /**
      * @param MediaTableGateway $mediaTableGateway
      * @param MediaOptions $mediaOptions
      */
-    public function __construct(MediaTableGateway $mediaTableGateway, MediaOptions $mediaOptions)
+    public function __construct(MediaTableGateway $mediaTableGateway, MediaOptions $mediaOptions, MediaUrl $mediaUrl)
     {
         $this->mediaTableGateway = $mediaTableGateway;
         $this->mediaOptions = $mediaOptions;
+        $this->mediaUrl = $mediaUrl;
     }
 
     /**
@@ -50,8 +56,7 @@ class MediaLink implements AdapterInterface
         if (empty($media)) {
             return '';
         }
-
-        return $this->mediaOptions->getUrl() . $media->getDirectory() . $media->getFilename();
+        return $this->mediaUrl->getUrl($media->getId());
     }
 
     /**
@@ -65,7 +70,7 @@ class MediaLink implements AdapterInterface
             return '';
         }
 
-        return $media->getTitle();
+        return $media->getFilename();
     }
 
     /**
@@ -76,5 +81,15 @@ class MediaLink implements AdapterInterface
     protected function getLinkData($value)
     {
         return $this->mediaTableGateway->selectByPrimary((int) $value['id']);
+    }
+
+    /**
+     * @return array
+     */
+    public function getPartials()
+    {
+        return [
+            'link/media.html' => 'link/media',
+        ];
     }
 }

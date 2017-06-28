@@ -16,6 +16,7 @@ use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use Media42\Link\Adapter\MediaLink as MediaLinkAdapter;
 use Media42\MediaOptions;
+use Media42\MediaUrl;
 use Media42\TableGateway\MediaTableGateway;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
@@ -39,7 +40,8 @@ class MediaLinkFactory implements FactoryInterface
     {
         return new MediaLinkAdapter(
             $container->get('TableGateway')->get(MediaTableGateway::class),
-            $container->get(MediaOptions::class)
+            $container->get(MediaOptions::class),
+            $container->get(MediaUrl::class)
         );
     }
 }
