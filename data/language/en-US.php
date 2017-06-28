@@ -32,4 +32,6 @@ return [
     'label.typeSelection.all'       => 'All',
     'label.typeSelection.images'    => 'Images',
     'label.typeSelection.pdf'       => 'PDF',
+
+    'link-type.media'               => 'Media',
 ];

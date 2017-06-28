@@ -1,0 +1,6 @@
+<?php
+$this->mediaOptions()->addAngularMediaConfig();
+?>
+<div ng-controller="LinkMediaController">
+    <ng-include src="'<?= $this->url('admin/media', ['referrer' => 'modal']) ?>'"></ng-include>
+</div>

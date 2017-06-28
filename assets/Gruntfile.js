@@ -33,6 +33,7 @@ module.exports = function(grunt) {
                     'javascripts/directive/form/*.js',
                     'javascripts/filter/*.js',
                     'javascripts/controller/*.js',
+                    'javascripts/controller/link/*.js',
                     'javascripts/service/*.js'
                 ],
                 dest: '<%= dist %>/js/media42.js'
