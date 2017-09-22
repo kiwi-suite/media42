@@ -25,6 +25,9 @@
                     <a class="m-t-sm btn btn-rounded btn-icon btn-default" ng-href="<?= $this->url('admin/media/edit', ['id' => '{{formData.value.id}}'])?>" target="_blank">
                         <i class="fa fa-edit"></i>
                     </a>
+                    <a class="m-t-sm btn btn-rounded btn-icon btn-default hidden-sm hidden-xs" ng-href="{{ getSrc(formData.value) }}" target="_blank">
+                        <i class="fa fa-share"></i>
+                    </a>
                 </div>
                 <div ng-show="!isImage(formData.value)" class="center text-center m-t-n w-full r-2x">
                     <i class="fa fa-5x" ng-class="getDocumentClass(formData.value)"></i>

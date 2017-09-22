@@ -186,6 +186,9 @@ $persistKey = md5($this->params('referrer'). $this->params('categorySelection') 
                                         <a class="m-t-sm btn btn-rounded btn-icon btn-danger" ng-click="delete('<?= $this->url('admin/media/delete')?>', row.id, '<?= $this->translate("media.modal.delete.title", "admin") ?>', '<?= $this->translate("media.modal.delete.content", "admin") ?>')">
                                             <i class="fa fa-trash-o"></i>
                                         </a>
+                                        <a class="m-t-sm btn btn-rounded btn-icon btn-default hidden-sm hidden-xs" ng-href="{{ getSrc(row) }}" target="_blank">
+                                            <i class="fa fa-share"></i>
+                                        </a>
                                     </div>
                                     <div class="r-b r-2x bottom w-full bg-blacker-opacity text-white wrapper-xs">
                                         <span class="text-xs text-ellipsis">
