@@ -170,7 +170,7 @@ $persistKey = md5($this->params('referrer'). $this->params('categorySelection') 
                     <div class="row">
                         <div ng-repeat="row in collection" class="<?= ($this->params()->fromRoute('referrer') == "index") ? "col-xs-6 col-sm-4 col-md-3 col-lg-2" : "col-xs-6 col-sm-6 col-md-4 col-lg-4"?>">
                             <div class="item m-t-md" style="overflow: hidden;">
-                                <div class="pos-rlt bg-for-transparent">
+                                <div class="pos-rlt bg-for-transparent" style="min-height: 100px;">
                                     <div class="top w-full m-l-sm">
                                         <?php if ($this->params()->fromRoute('referrer') != "index"): ?>
                                             <a class="m-t-sm btn btn-rounded btn-icon btn-default" ng-class="{'btn-success': selectedMedia.id == row.id}" ng-click="selectMedia(row)">
