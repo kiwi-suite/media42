@@ -1,53 +1,63 @@
 <div class="form-group" ng-class="{'has-error': formData.errors.length}">
-    <div class="col-sm-3 col-md-2 control-label">
-        <div class="pull-left hidden-sm hidden-xs">
-            <span class="fa fa-fw text-danger" ng-class="{'fa-exclamation-triangle': formData.errors.length}"></span>
-            <a ng-show="formData.value.id > 0" class="text-light" ng-click="empty()">
-                <i class="fa fa-fw fa-trash"></i>
-            </a>
-        </div>
-        <div class="pull-right">
-            <a class="text-muted" ng-if="formData.description != null" uib-popover="{{ formData.description }}" popover-trigger="'mouseenter'">
-                <i class="fa fa-question-circle"></i>
-            </a>
-            <label for="{{ formData.id }}">{{ formData.label }}</label>
+    <div class="col-sm-4 col-md-3 control-label">
+        <label for="{{ formData.id }}" uib-popover="{{ formData.description }}" popover-trigger="'mouseenter'">
+            <i class="fa fa-question-circle-o text-muted" ng-if="formData.description != null"></i>
+            {{ formData.label }}
             <span ng-if="formData.required">*</span>
-        </div>
-        <div class="clearfix"></div>
+        </label>
+        <span class="fa fa-fw text-danger pull-left"
+              ng-class="{'fa-exclamation-triangle': formData.errors.length}"></span>
     </div>
-    <div ng-show="formData.value.id > 0" class="col-sm-2 col-md-2">
-        <div class="item" style="overflow: hidden;">
-            <div class="pos-rlt bg-for-transparent">
-                <div class="top w-full m-l-sm">
-                    <a ng-show="isImage(formData.value)" class="m-t-sm btn btn-rounded btn-icon btn-default" ng-href="{{ getSrc(formData.value) }}" lightbox>
-                        <i class="fa fa-search-plus"></i>
-                    </a>
-                    <a class="m-t-sm btn btn-rounded btn-icon btn-default" ng-href="<?= $this->url('admin/media/edit', ['id' => '{{formData.value.id}}'])?>" target="_blank">
-                        <i class="fa fa-edit"></i>
-                    </a>
-                    <a class="m-t-sm btn btn-rounded btn-icon btn-default hidden-sm hidden-xs" ng-href="{{ getSrc(formData.value) }}" target="_blank">
-                        <i class="fa fa-share"></i>
-                    </a>
-                </div>
-                <div ng-show="!isImage(formData.value)" class="center text-center m-t-n w-full r-2x">
-                    <i class="fa fa-5x" ng-class="getDocumentClass(formData.value)"></i>
-                </div>
+    <!--    <div ng-class="{'col-sm-8': formData.value.id == null, 'col-md-9': formData.value.id == null, 'col-sm-6': formData.value.id > 0, 'col-md-7': formData.value.id > 0}">-->
+    <div class="col-sm-8 col-md-9 col-control">
+        <div class="control-actions">
+            <button type="button" class="btn btn-link" ng-show="formData.value.id > 0 && !formData.readonly" ng-click="empty()">
+                <i class="fa fa-fw fa-times"></i>
+            </button>
+        </div>
 
-                <img ng-show="isImage(formData.value)" ng-src="{{ getSrc(formData.value, 'admin_thumbnail') }}" class="img-full r r-2x">
-                <img ng-show="!isImage(formData.value)" src="<?= $this->assetUrl('/images/document-placeholder.jpg', 'admin42') ?>" class="img-full r r-2x">
-            </div>
-        </div>
-    </div>
-    <div ng-class="{'col-sm-9': formData.value.id == null, 'col-md-10': formData.value.id == null, 'col-sm-7': formData.value.id > 0, 'col-md-8': formData.value.id > 0}">
         <input type="hidden" name="{{ formData.name }}" value="{{ formData.value.id }}">
         <div class="input-group">
-            <input type="text" class="form-control" value="{{ formData.value.filename }}" disabled>
             <span class="input-group-btn">
-                <a type="button" class="btn btn-default" ng-click="selectMedia()">
-                    <i class="fa fa-check"></i>
-                    <?= $this->translate('button.select', 'admin') ?>
-                </a>
+                <button type="button" class="btn btn-default" ng-click="selectMedia()"
+                   uib-popover="<?= $this->translate('button.select', 'admin') ?>" popover-trigger="'mouseenter'">
+                    <i class="fa fa-fw fa-picture-o text-info"></i>
+                </button>
             </span>
+            <input type="text" class="form-control" style="padding-right:36px;" value="{{ formData.value.filename }}"
+                   disabled>
+        </div>
+
+        <div ng-show="formData.value.id > 0">
+            <div class="item">
+                <div class="pos-rlt bg-for-transparent">
+                    <div class="top w-full m-l-sm">
+                        <a ng-show="isImage(formData.value)" class="m-t-sm btn btn-rounded btn-icon btn-default"
+                           ng-href="{{ getSrc(formData.value) }}" lightbox>
+                            <i class="fa fa-search-plus"></i>
+                        </a>
+                        <a class="m-t-sm btn btn-rounded btn-icon btn-default"
+                           ng-href="<?= $this->url('admin/media/edit', ['id' => '{{formData.value.id}}']) ?>"
+                           target="_blank">
+                            <i class="fa fa-edit"></i>
+                        </a>
+                        <a class="m-t-sm btn btn-rounded btn-icon btn-default"
+                           ng-href="{{ getSrc(formData.value) }}" target="_blank">
+                            <i class="fa fa-share"></i>
+                        </a>
+                    </div>
+                    <div class="text-center" style="overflow: hidden; height: 100px;">
+                        <div ng-show="!isImage(formData.value)" class="center text-center m-t-n w-full r-2x">
+                            <i class="fa fa-5x" ng-class="getDocumentClass(formData.value)"></i>
+                        </div>
+                        <img ng-show="isImage(formData.value)" ng-src="{{ getSrc(formData.value, 'admin_thumbnail') }}"
+                             class="r r-2x" style="display:inline-block;max-width:100%;max-height:100%">
+                        <img ng-show="!isImage(formData.value)"
+                             src="<?= $this->assetUrl('/images/document-placeholder.jpg', 'admin42') ?>"
+                             class="r r-2x" style="display:inline-block;max-width:100%;max-height:100%">
+                    </div>
+                </div>
+            </div>
         </div>
 
         <ul ng-if="formData.errors.length" class="list-unstyled text-danger">

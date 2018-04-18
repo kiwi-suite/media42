@@ -26,10 +26,10 @@ return [
     'media.error.filesize'          => 'Eine der Datein überschreitet die maximale Dateigröße von ',
     'media.warning.image-too-small' => 'Bild zu klein',
 
-    'media.category.all'            => 'Alla Kategorien',
+    'media.category.all'            => 'Alle Kategorien',
     'media.category.default'        => 'Default',
 
-    'label.typeSelection.all'       => 'Alla',
+    'label.typeSelection.all'       => 'Alle',
     'label.typeSelection.images'    => 'Bilder',
     'label.typeSelection.pdf'       => 'PDF',
 
