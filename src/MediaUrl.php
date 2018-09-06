@@ -15,7 +15,6 @@ namespace Media42;
 use Media42\Model\Media;
 use Media42\Selector\MediaSelector;
 use Media42\TableGateway\MediaTableGateway;
-use Psr\Cache\CacheItemPoolInterface;
 
 class MediaUrl
 {
@@ -58,13 +57,16 @@ class MediaUrl
     }
 
     /**
-     * @param $mediaId
+     * @param $media
      * @param null $dimension
      * @return string
      */
-    public function getUrl($mediaId, $dimension = null)
+    public function getUrl($media, $dimension = null)
     {
-        $media = $this->mediaSelector->setMediaId($mediaId)->getResult();
+        if (!$media instanceof Media) {
+            $media = $this->mediaSelector->setMediaId($media)->getResult();
+        }
+
         if (empty($media)) {
             return '';
         }
@@ -74,11 +76,11 @@ class MediaUrl
             $baseUrl = $this->basePath;
         }
 
-        if (strlen($this->mediaOptions->getUrl())) {
+        if (\strlen($this->mediaOptions->getUrl())) {
             $baseUrl .= $this->mediaOptions->getUrl();
         }
 
-        if (substr($media->getMimeType(), 0, 6) != 'image/' || $dimension === null) {
+        if (\substr($media->getMimeType(), 0, 6) != 'image/' || $dimension === null) {
             return $baseUrl . $media->getDirectory() . $media->getFilename();
         }
 
@@ -87,9 +89,9 @@ class MediaUrl
             return '';
         }
 
-        $pos = strrpos($media->getFilename(), '.');
-        $filename = substr($media->getFilename(), 0, $pos);
-        $extension = substr($media->getFilename(), $pos);
+        $pos = \strrpos($media->getFilename(), '.');
+        $filename = \substr($media->getFilename(), 0, $pos);
+        $extension = \substr($media->getFilename(), $pos);
 
         $filename .= '-'
             . (($dimension['width'] == 'auto') ? '000' : $dimension['width'])
@@ -98,6 +100,6 @@ class MediaUrl
             . $extension;
 
 
-        return $baseUrl . $media->getDirectory() . rawurlencode($filename);
+        return $baseUrl . $media->getDirectory() . \rawurlencode($filename);
     }
 }
