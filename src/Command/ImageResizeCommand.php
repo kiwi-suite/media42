@@ -92,6 +92,7 @@ class ImageResizeCommand extends AbstractCommand
     public function setDimension($dimension)
     {
         $this->dimension = $dimension;
+        $this->dimensionName = $dimension['name'];
 
         return $this;
     }
@@ -166,36 +167,47 @@ class ImageResizeCommand extends AbstractCommand
         switch ($resizeType) {
             case 'crop':
 
-                $imageSize = $image->getSize();
+                $meta = $this->media->getMeta();
+                if (!empty($meta['crop'][$this->dimensionName])) {
+                    $boxWidth = $meta['crop'][$this->dimensionName]['width'];
+                    $boxHeight = $meta['crop'][$this->dimensionName]['height'];
+                    $offsetX = $meta['crop'][$this->dimensionName]['x'];
+                    $offsetY = $meta['crop'][$this->dimensionName]['y'];
+                } else {
+                    $imageSize = $image->getSize();
+                    $offsetX = 0;
+                    $offsetY = 0;
 
-                $imageRatio = $imageSize->getWidth() / $imageSize->getHeight();
+                    $imageRatio = $imageSize->getWidth() / $imageSize->getHeight();
 
-                if ($this->dimension['width'] != 'auto' && $this->dimension['height'] != 'auto') {
-                    $dimensionRatio = $this->dimension['width'] / $this->dimension['height'];
+                    if ($this->dimension['width'] != 'auto' && $this->dimension['height'] != 'auto') {
+                        $dimensionRatio = $this->dimension['width'] / $this->dimension['height'];
 
-                    if ($imageRatio < $dimensionRatio) {
-                        $boxWidth = $imageSize->getWidth();
-                        $boxHeight = round($imageSize->getWidth() / $dimensionRatio);
-                    } elseif ($imageRatio > $dimensionRatio) {
-                        $boxHeight = $imageSize->getHeight();
-                        $boxWidth = round($imageSize->getHeight() * $dimensionRatio);
+                        if ($imageRatio < $dimensionRatio) {
+                            $boxWidth = $imageSize->getWidth();
+                            $boxHeight = round($imageSize->getWidth() / $dimensionRatio);
+                        } elseif ($imageRatio > $dimensionRatio) {
+                            $boxHeight = $imageSize->getHeight();
+                            $boxWidth = round($imageSize->getHeight() * $dimensionRatio);
+                        } else {
+                            $boxWidth = $imageSize->getWidth();
+                            $boxHeight = $imageSize->getHeight();
+                        }
                     } else {
                         $boxWidth = $imageSize->getWidth();
                         $boxHeight = $imageSize->getHeight();
                     }
-                } else {
-                    $boxWidth = $imageSize->getWidth();
-                    $boxHeight = $imageSize->getHeight();
                 }
 
                 /** @var ImageCropCommand $imageCropCmd */
                 $imageCropCmd = $this->getCommand(ImageCropCommand::class);
 
-                return $imageCropCmd->setBoxWidth($boxWidth)
+                return $imageCropCmd
+                    ->setBoxWidth($boxWidth)
                     ->setBoxHeight($boxHeight)
                     ->setDimension($this->dimension)
-                    ->setOffsetX(0)
-                    ->setOffsetY(0)
+                    ->setOffsetX($offsetX)
+                    ->setOffsetY($offsetY)
                     ->setMedia($this->media)
                     ->run();
 
