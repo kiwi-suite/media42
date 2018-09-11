@@ -72,7 +72,10 @@ class Media
      */
     public function getImageSize($dimension = null)
     {
-        if (substr($this->getMimeType(), 0, 6) != 'image/') {
+        $mimeType = $this->getMimeType();
+        if (\substr($mimeType, 0, 6) != 'image/' ||
+            \substr($mimeType, 0, 9) == 'image/svg'
+        ) {
             return;
         }
 

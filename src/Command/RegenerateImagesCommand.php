@@ -47,14 +47,15 @@ class RegenerateImagesCommand extends AbstractCommand
         $mediaResultSet = $this->getTableGateway(MediaTableGateway::class)->select();
         /** @var Media $media */
         foreach ($mediaResultSet as $media) {
-            if (substr($media->getMimeType(), 0, 6) != 'image/') {
+            if (\substr($media->getMimeType(), 0, 6) != 'image/' ||
+                \substr($media->getMimeType(), 0, 9) == 'image/svg'
+            ) {
                 continue;
             }
 
             $cmd = PHP_BINARY . ' vendor/fruit42/core42/bin/fruit media-regenerate --media=' . $media->getId();
 
             passthru($cmd);
-
         }
     }
 

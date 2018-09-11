@@ -78,7 +78,10 @@ class MediaUrl
             $baseUrl .= $this->mediaOptions->getUrl();
         }
 
-        if (substr($media->getMimeType(), 0, 6) != 'image/' || $dimension === null) {
+        if ($dimension === null ||
+            \substr($media->getMimeType(), 0, 6) != 'image/' ||
+            \substr($media->getMimeType(), 0, 9) == 'image/svg'
+        ) {
             return $baseUrl . $media->getDirectory() . $media->getFilename();
         }
 

@@ -58,7 +58,9 @@ class MediaEventListener extends AbstractListenerAggregate
         /** @var Media $media */
         $media = $event->getTarget();
 
-        if (substr($media->getMimeType(), 0, 6) != 'image/') {
+        if (\substr($media->getMimeType(), 0, 6) != 'image/' ||
+            \substr($media->getMimeType(), 0, 9) == 'image/svg'
+        ) {
             return;
         }
 
@@ -75,7 +77,9 @@ class MediaEventListener extends AbstractListenerAggregate
         /** @var Media $media */
         $media = $event->getTarget();
 
-        if (substr($media->getMimeType(), 0, 6) != 'image/') {
+        if (\substr($media->getMimeType(), 0, 6) != 'image/' ||
+            \substr($media->getMimeType(), 0, 9) == 'image/svg'
+        ) {
             return;
         }
 

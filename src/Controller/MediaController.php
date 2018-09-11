@@ -101,7 +101,10 @@ class MediaController extends AbstractAdminController
 
         $imageSize = null;
         $imageEditing = false;
-        if (count($dimensions) > 0 && substr($media->getMimeType(), 0, 6) == 'image/') {
+        if (\count($dimensions) > 0 &&
+            \substr($media->getMimeType(), 0, 6) == 'image/' &&
+            \substr($media->getMimeType(), 0, 9) != 'image/svg'
+        ) {
             $filename = $mediaOptions->getPath() . $media->getDirectory() . $media->getFilename();
             if (file_exists($filename)) {
                 $imageEditing = true;
