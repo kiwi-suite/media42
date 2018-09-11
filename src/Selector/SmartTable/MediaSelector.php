@@ -41,7 +41,7 @@ class MediaSelector extends AbstractSmartTableSelector
                     'image/png',
                     'image/tiff',
                     'image/bmp',
-                    'image/bmp',
+                    'image/svg',
                 ]);
             } elseif ($this->search['typeSelection'] == 'pdf') {
                 $typeSearchWhere->in('mimeType', [
